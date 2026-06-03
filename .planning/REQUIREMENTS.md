@@ -60,4 +60,4 @@ Per-ticket feature and bug work is planned individually as tickets arrive (read 
 
 ---
 *Requirements defined: 2026-06-03*
-*Last updated: 2026-06-03 after initial definition*
+*Last updated: 2026-06-03 after roadmap creation*
