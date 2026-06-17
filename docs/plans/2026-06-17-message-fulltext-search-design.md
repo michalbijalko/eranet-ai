@@ -85,18 +85,38 @@ wrapped in `criteriaBuilder.lower(...)` with a lower-cased pattern — the estab
 pattern in `ProcurementDao` (lines 367/383/390). CLAUDE.md rule #7 (follow existing
 patterns).
 
-## Engineering verification (before "done") — STILL OPEN
+## Case-sensitivity — root cause and resolution
 
-- **Runtime smoke test required.** `LOWER()` applied to a MySQL `BLOB` is a no-op on
-  binary strings unless the value is first converted to a non-binary charset. Whether
-  EclipseLink's `.as(String.class)` emits a `CAST(body AS CHAR)` (which would make
-  `LOWER` effective and the whole `LIKE` work) cannot be verified statically — it must
-  be tested against the real MySQL + EclipseLink. If case-insensitive body search does
-  not work, the fix is `CONVERT(body USING utf8)` before `LOWER`, or the EP-13100
-  plain-text column.
-- Smoke test matrix: term in body only / subject only / both; mixed case; with and
-  without "show unread"; on inbox and sent lists.
-- Server has not yet been compiled in this environment.
+Confirmed by test: body search was case-*sensitive*. Root cause: `body` is a `BLOB`,
+which has no collation, and MySQL `LOWER()` is a no-op on binary data — so
+`LOWER(body)` returned the bytes unchanged. EclipseLink's `.as(String.class)` is a
+Java-side type coercion and does not emit a real SQL `CAST`.
+
+**Fix:** convert `message.body` `BLOB → LONGTEXT` (it only ever holds plain UTF-8 text;
+attachments are stored separately in `attachment_ids` + the File subsystem). A
+researcher pass over all ~85 `setBody`/`getBody` call sites confirmed no binary content
+is ever stored and the `@Lob byte[]` mapping keeps working over `LONGTEXT` unchanged.
+Once the column is `LONGTEXT`, the already-committed `lower(...)` predicate becomes
+effective and search is case-insensitive.
+
+Liquibase: `src/main/sql/2.11.0/db.changelog-EP13114.xml`
+(`modifyDataType … LONGTEXT`, author `m.bijalko`), registered in the master changelog.
+
+## Resolution of the unread-filter report
+
+"Unread messages never show when searching" was a **stale browser cache** — the old
+client bundle still applied the previous `readDatetime = notNull` (read-only)
+restriction on search. The current client source removes it. Confirmed working after a
+hard refresh. No code change needed beyond the committed client fix.
+
+## Remaining before "done"
+
+- **Apply the migration** (deploy → Liquibase runs) and retest case-insensitive body
+  search (e.g. search `faktura`, body contains `Faktúra`).
+- **Charset check (pre-prod):** confirm the live `message` table charset is UTF-8
+  (`SHOW CREATE TABLE message`). If it is `latin1`, the `BLOB → LONGTEXT` alter must
+  pin `CHARACTER SET utf8mb4` to avoid mojibake on Slovak characters.
+- Smoke matrix: term in body only / subject only / both; mixed case; inbox and sent.
 
 ## Implementation status
 
