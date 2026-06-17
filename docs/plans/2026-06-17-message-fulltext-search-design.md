@@ -99,8 +99,13 @@ is ever stored and the `@Lob byte[]` mapping keeps working over `LONGTEXT` uncha
 Once the column is `LONGTEXT`, the already-committed `lower(...)` predicate becomes
 effective and search is case-insensitive.
 
-Liquibase: `src/main/sql/2.11.0/db.changelog-EP13114.xml`
-(`modifyDataType … LONGTEXT`, author `m.bijalko`), registered in the master changelog.
+Liquibase: `src/main/sql/2.11.0/db.changelog-EP13114.xml` (author `m.bijalko`),
+registered in the master changelog. Uses an explicit
+`ALTER TABLE message MODIFY body LONGTEXT CHARACTER SET utf8mb4` (with a rollback to
+`BLOB`) rather than `modifyDataType`, so the charset is pinned: `BLOB → TEXT` relabels
+the existing bytes without transcoding, so the target must be UTF-8 for the stored
+Slovak text to read back correctly **regardless of the table's default charset** — safe
+for test and production without needing to know their current charset.
 
 ## Resolution of the unread-filter report
 
@@ -112,10 +117,9 @@ hard refresh. No code change needed beyond the committed client fix.
 ## Remaining before "done"
 
 - **Apply the migration** (deploy → Liquibase runs) and retest case-insensitive body
-  search (e.g. search `faktura`, body contains `Faktúra`).
-- **Charset check (pre-prod):** confirm the live `message` table charset is UTF-8
-  (`SHOW CREATE TABLE message`). If it is `latin1`, the `BLOB → LONGTEXT` alter must
-  pin `CHARACTER SET utf8mb4` to avoid mojibake on Slovak characters.
+  search (e.g. search `faktura`, body contains `Faktúra`). Charset is pinned to
+  utf8mb4 in the changeset, so this is safe in test and production without knowing the
+  current table charset.
 - Smoke matrix: term in body only / subject only / both; mixed case; inbox and sent.
 
 ## Implementation status
