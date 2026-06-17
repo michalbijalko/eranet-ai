@@ -99,6 +99,13 @@ is ever stored and the `@Lob byte[]` mapping keeps working over `LONGTEXT` uncha
 Once the column is `LONGTEXT`, the already-committed `lower(...)` predicate becomes
 effective and search is case-insensitive.
 
+**Entity mapping:** `@Lob byte[]` does NOT work over a `LONGTEXT` column — EclipseLink
+reads the column as `String` and throws `ConversionException` (String → `[B`) on every
+message-list query. Fixed with a JPA `AttributeConverter<byte[], String>`
+(`MessageBodyConverter`) so the entity keeps its `byte[]` field/API (all ~85 call sites
+and the JSON/XML serializers unchanged) while EclipseLink reads/writes the character
+column as text. `@Lob` removed from `body`; `@Convert` added.
+
 Liquibase: `src/main/sql/2.11.0/db.changelog-EP13114.xml` (author `m.bijalko`),
 registered in the master changelog. Uses an explicit
 `ALTER TABLE message MODIFY body LONGTEXT CHARACTER SET utf8mb4` (with a rollback to
