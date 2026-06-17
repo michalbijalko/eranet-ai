@@ -106,6 +106,12 @@ message-list query. Fixed with a JPA `AttributeConverter<byte[], String>`
 and the JSON/XML serializers unchanged) while EclipseLink reads/writes the character
 column as text. `@Lob` removed from `body`; `@Convert` added.
 
+A code audit across the server confirmed the converter is transparent: it is explicitly
+scoped (not `autoApply`, so no other `byte[]` field is affected), the email/PDF paths
+read `new String(getBody(), UTF-8)` (pure Java on the `byte[]`, unaffected), there are no
+native queries / value-comparisons / sibling entity mappings on `body`, and the JSON/XML
+serializers still operate on `byte[]` (wire formats unchanged).
+
 Liquibase: `src/main/sql/2.11.0/db.changelog-EP13114.xml` (author `m.bijalko`),
 registered in the master changelog. Uses an explicit
 `ALTER TABLE message MODIFY body LONGTEXT CHARACTER SET utf8mb4` (with a rollback to
