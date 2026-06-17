@@ -104,7 +104,11 @@ reads the column as `String` and throws `ConversionException` (String → `[B`) 
 message-list query. Fixed with a JPA `AttributeConverter<byte[], String>`
 (`MessageBodyConverter`) so the entity keeps its `byte[]` field/API (all ~85 call sites
 and the JSON/XML serializers unchanged) while EclipseLink reads/writes the character
-column as text. `@Lob` removed from `body`; `@Convert` added.
+column as text. `@Lob` removed from `body`; `@Convert` added. The converter must also be
+declared in `persistence.xml` (`<class>…MessageBodyConverter</class>`) — this PU
+enumerates every managed class, so EclipseLink does not register the converter (and
+predeployment fails with EclipseLink-7351 "converter class … was not found") unless it is
+listed.
 
 A code audit across the server confirmed the converter is transparent: it is explicitly
 scoped (not `autoApply`, so no other `byte[]` field is affected), the email/PDF paths
