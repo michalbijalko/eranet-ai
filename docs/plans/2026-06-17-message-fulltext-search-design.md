@@ -74,19 +74,34 @@ other message list with the filter — satisfied automatically by the DAO-level 
 When `html_body` is added, extend the server OR to
 `subject OR body OR html_body`. Single, localised change at the same spot.
 
-## Engineering verification (before "done")
+## Column types (confirmed)
 
-- The body predicate casts a `@Lob byte[]` field via `.as(String.class)`. Confirm:
-  1. EclipseLink generates valid SQL against the column.
-  2. Body matching is **case-insensitive**, consistent with the subject search — a
-     BLOB-mapped column can match case-*sensitively*, which would be inconsistent UX
-     (subject finds "Faktúra", body misses "faktúra").
-- Smoke test: term in body only, term in subject only, term in both, with and without
-  "show unread", on inbox and sent lists.
+From `publicERANET-server/src/main/sql/db.changelog-1.0.xml` (changeSet
+`tabulky_pre_spravy`): `subject` is `VARCHAR(255)`, `body` is `BLOB`.
+
+A `VARCHAR` `LIKE` is case-insensitive via collation; a `BLOB` `LIKE` is
+case-*sensitive* (binary). To keep subject and body search consistent, both sides are
+wrapped in `criteriaBuilder.lower(...)` with a lower-cased pattern — the established
+pattern in `ProcurementDao` (lines 367/383/390). CLAUDE.md rule #7 (follow existing
+patterns).
+
+## Engineering verification (before "done") — STILL OPEN
+
+- **Runtime smoke test required.** `LOWER()` applied to a MySQL `BLOB` is a no-op on
+  binary strings unless the value is first converted to a non-binary charset. Whether
+  EclipseLink's `.as(String.class)` emits a `CAST(body AS CHAR)` (which would make
+  `LOWER` effective and the whole `LIKE` work) cannot be verified statically — it must
+  be tested against the real MySQL + EclipseLink. If case-insensitive body search does
+  not work, the fix is `CONVERT(body USING utf8)` before `LOWER`, or the EP-13100
+  plain-text column.
+- Smoke test matrix: term in body only / subject only / both; mixed case; with and
+  without "show unread"; on inbox and sent lists.
+- Server has not yet been compiled in this environment.
 
 ## Implementation status
 
-Implemented and committed:
+Implemented and committed (local only, branch `seas-test`):
 
 - `publicERANET-server` `6ecb5c530` — `feat(EP-13104, EP-13114): search message body in addition to subject`
+- `publicERANET-server` `741a85e51` — `fix(EP-13104, EP-13114): make subject/body search case-insensitive`
 - `publicERANET-client` `b7e76dd3d` — `feat(EP-13104, EP-13114): search messages regardless of read status`
