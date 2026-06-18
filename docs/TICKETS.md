@@ -23,9 +23,9 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 
 | Feature | Story | Dev |
 |---|---|---|
-| _(example)_ Contract Type Enum | `EP-12688` | `EP-12689` |
+| Fulltext search in message body | `EP-13104` | `EP-13114` |
 
-<!-- Add a row per ticket pair as work arrives. Remove the example row once real rows exist. -->
+<!-- Add a row per ticket pair as work arrives. -->
 
 ---
 *Maintained as new EP tickets are picked up.*
