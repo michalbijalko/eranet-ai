@@ -11,8 +11,9 @@ session once the work is verified.
 
 This is **not** MemPalace and **not** Jira. MemPalace stores session memory; Jira/commits
 record what changed for this ticket. This skill updates the **persistent guidance** —
-`CLAUDE.md`, `.claude/skills/*`, `docs/codebase/*` — i.e. the rules that steer every future
-session. If a lesson only matters to this one ticket, it does **not** belong here.
+`CLAUDE.md`, `.claude/skills/*`, `.claude/agents/*`, `docs/codebase/*` — i.e. the rules and
+workflows that steer every future session. If a lesson only matters to this one ticket, it
+does **not** belong here.
 
 ## Step 1 — Review the session
 
@@ -47,8 +48,14 @@ thoughts" with no future action.
 |---|---|
 | Top-level rule / discipline that applies to all work | `CLAUDE.md` |
 | Guidance specific to one activity (coding, deploy, review, testing, …) | the matching `.claude/skills/<name>/SKILL.md` |
+| Wrong behavior, missing instruction, or bad tool/skill scope in a subagent (planner, executor, reviewer) | the matching `.claude/agents/<name>.md` |
 | A fact about how the codebase/stack actually works, or a known caveat | `docs/codebase/*.md` (CONVENTIONS, ARCHITECTURE, CONCERNS, STACK, …) |
 | A whole area no existing skill covers | a **new** `.claude/skills/<name>/SKILL.md` (only when it genuinely doesn't fit an existing one) |
+
+When fixing an agent, also keep its row in the **Agents** table in `CLAUDE.md` in sync if the
+trigger, tools, or loaded skills change. Edit an agent's body the same way as a skill —
+**minimal, surgical** additions in the same tone; don't restructure the file or broaden a
+reviewer's read-only toolset without the user explicitly agreeing.
 
 Prefer **editing an existing file** over creating a new one. Prefer the **smallest** addition
 that captures the rule.

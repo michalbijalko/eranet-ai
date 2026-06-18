@@ -101,3 +101,17 @@ These skills encode SEAS-specific rules for each activity. **Read the relevant s
 | `documentation` | Writing or updating docs | What to produce, format (`docs/` or Nuklino), keep in sync with code changes |
 | `demo-material` | Preparing a stakeholder demo | Demo script, per-step talking points, demo data setup, screenshots |
 | `client-training` | Creating training guides for end users | Step-by-step guides in Slovak, with screenshots, organized by user task |
+
+## Agents (`.claude/agents/`)
+
+Project-specific subagents that encode the SEAS workflow. Each loads the relevant skills above (and `superpowers:*`) itself. Delegate to them via the `Agent` tool; the typical flow is **brainstorm (with the user) → planner → executor → code-reviewer**.
+
+| Agent | When to use | Tools | Loads |
+|-------|-------------|-------|-------|
+| `planner` | After intent is brainstormed with the user — turn one `EP-XXXX` ticket into a backend/frontend-split implementation plan | Read-only + Write (plans) + Atlassian | `issue-tracking`, `feasibility`, `app-foundation`, `coding-conventions`, `superpowers:writing-plans` |
+| `executor-backend` | Implement the Java EE 7 server slice of an approved plan | Full edit + Bash | `coding-conventions`, `app-foundation`, `security`, `authentication`, `superpowers:executing-plans` / `test-driven-development` / `systematic-debugging` / `verification-before-completion` |
+| `executor-frontend` | Implement the AngularJS 1.5 client slice of an approved plan | Full edit + Bash | `coding-conventions`, `app-foundation`, `ui-design`, `testing`, same `superpowers:*` set |
+| `code-reviewer-backend` | Review a server diff before a PR/merge | Read-only (no Edit/Write) | `code-review`, `coding-conventions`, `security`, `authentication`, `issue-tracking` |
+| `code-reviewer-frontend` | Review a client diff before a PR/merge | Read-only (no Edit/Write) | `code-review`, `coding-conventions`, `ui-design`, `testing`, `issue-tracking` |
+
+Rules: **brainstorming stays in the main thread** with the user (a subagent can't brainstorm) — the planner requires it to have happened and stops to ask if intent is unclear. Reviewers are deliberately **read-only** so a review can never mutate code. All agents inherit the session model (`model: inherit`) and obey the same hard rules as the rest of this file (one ticket per commit, English-only identifiers, layer discipline, design reuse).
