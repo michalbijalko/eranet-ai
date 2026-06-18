@@ -21,9 +21,9 @@
 **Depends on**: Nothing (first phase)
 **Requirements**: CONV-01, CONV-02, CONV-03, CONV-04, CONV-05, CONV-06, CONV-07, CONV-08, FLOW-01, FLOW-02, FLOW-03
 **Success Criteria** (what must be TRUE):
-  1. `CLAUDE.md` exists at the workspace root and contains all eight conventions (commit format, one-ticket-per-commit, English-only code, UI reuse, BaseService-first, Liquibase, readability) plus references to `.planning/TICKETS.md` — readable and loaded automatically into every agent context.
-  2. `.planning/TICKETS.md` exists with a Story→Dev ticket mapping table scaffold and is referenced from `CLAUDE.md` so agents look it up before every commit.
-  3. An agent starting a new ticket can verify the correct commit prefix by reading `CLAUDE.md` and `.planning/TICKETS.md` without asking the user for format guidance.
+  1. `CLAUDE.md` exists at the workspace root and contains all eight conventions (commit format, one-ticket-per-commit, English-only code, UI reuse, BaseService-first, Liquibase, readability) plus references to `docs/TICKETS.md` — readable and loaded automatically into every agent context.
+  2. `docs/TICKETS.md` exists with a Story→Dev ticket mapping table scaffold and is referenced from `CLAUDE.md` so agents look it up before every commit.
+  3. An agent starting a new ticket can verify the correct commit prefix by reading `CLAUDE.md` and `docs/TICKETS.md` without asking the user for format guidance.
   4. The English-only rule and the Jira-ticket-first rule are documented explicitly enough that a new agent session rejects Slovak identifiers/keys and refuses to plan work before reading the EP ticket.
 **Plans**: TBD
 

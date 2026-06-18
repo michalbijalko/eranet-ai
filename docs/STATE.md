@@ -50,7 +50,7 @@
 
 - [ ] Plan Phase 1 (`/gsd:plan-phase 1`)
 - [ ] Write `CLAUDE.md` with all eight conventions
-- [ ] Create `.planning/TICKETS.md` with Story→Dev mapping scaffold
+- [ ] Create `docs/TICKETS.md` with Story→Dev mapping scaffold
 
 ### Blockers
 
@@ -60,9 +60,9 @@ None.
 
 ## Session Continuity
 
-**Returning agent:** Read `ROADMAP.md` for phase structure, then `PROJECT.md` for core constraints. Check `.planning/TICKETS.md` before any commit. Read the EP Jira ticket before discussing or planning any feature work.
+**Returning agent:** Read `ROADMAP.md` for phase structure, then `PROJECT.md` for core constraints. Check `docs/TICKETS.md` before any commit. Read the EP Jira ticket before discussing or planning any feature work.
 
-**Architecture context:** Java EE 7 (`publicERANET-server`) + AngularJS 1.5 (`publicERANET-client`), two separate git repos under a workspace root. Planning docs live in the workspace root `.planning/` directory.
+**Architecture context:** Java EE 7 (`publicERANET-server`) + AngularJS 1.5 (`publicERANET-client`), two separate git repos under a workspace root. Planning docs live in the workspace root `docs/` directory.
 
 ---
 

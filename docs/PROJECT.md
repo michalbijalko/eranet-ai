@@ -12,7 +12,7 @@ Every change traces to exactly one Jira ticket, follows the existing codebase pa
 
 ### Validated
 
-<!-- Inferred from the existing codebase (.planning/codebase/). These already work and are relied upon. -->
+<!-- Inferred from the existing codebase (docs/codebase/). These already work and are relied upon. -->
 
 - ✓ Public-procurement lifecycle: procurement, qualification, planning, evaluation, communication domains — existing
 - ✓ Authentication & SSO: Java EE FORM login, UPVS SAML 2.0 SSO, OIDC/JWT — existing
@@ -28,7 +28,7 @@ Every change traces to exactly one Jira ticket, follows the existing codebase pa
 <!-- This milestone's setup deliverables. Hypotheses until shipped. Feature/bug work is planned per Jira ticket as it arrives. -->
 
 - [ ] Engineering conventions captured and enforced in `CLAUDE.md` (always in context)
-- [ ] Story→Dev ticket mapping maintained in `.planning/TICKETS.md`, referenced from `CLAUDE.md`
+- [ ] Story→Dev ticket mapping maintained in `docs/TICKETS.md`, referenced from `CLAUDE.md`
 - [ ] Jira-ticket-first workflow established: read the EP ticket (via Atlassian integration) before any discussion or planning
 - [ ] Ongoing: each new feature / bug fix delivered per ticket, following all conventions
 
@@ -44,13 +44,13 @@ Every change traces to exactly one Jira ticket, follows the existing codebase pa
 - **Why these rules exist:** On a prior project, AI-assisted commits caused problems — incorrect commit attribution, mixed tickets, Slovak leaking into code, inventing new UI instead of reusing existing components, and ignoring established patterns. This milestone front-loads those lessons as enforced constraints.
 - **Two separate git repositories:** `publicERANET-client` and `publicERANET-server` each have their own `.git`. The workspace root is a coordination/planning repo; planning docs stay local (multi-repo workspace).
 - **Jira access:** The Atlassian/Jira integration is connected — ticket **text** can be read directly. Images cannot; Claude must ask the user to paste any image a ticket depends on.
-- **Existing patterns to follow** (from `.planning/codebase/`): paired `$resource` + service factories (client); `@Stateless @Path` services extending `BaseService<T>` with `BaseDao<T>` data access (server); entities serialized directly as JSON; Liquibase changesets for schema.
+- **Existing patterns to follow** (from `docs/codebase/`): paired `$resource` + service factories (client); `@Stateless @Path` services extending `BaseService<T>` with `BaseDao<T>` data access (server); entities serialized directly as JSON; Liquibase changesets for schema.
 
 ## Constraints
 
-- **Commit format**: `feat|fix(STORY, DEV): description` — story ticket first, dev ticket second. **Never** put the epic in the first slot. Look up the correct pair in `.planning/TICKETS.md` before every commit. — Traceability; prevents the attribution bugs seen on the prior project.
+- **Commit format**: `feat|fix(STORY, DEV): description` — story ticket first, dev ticket second. **Never** put the epic in the first slot. Look up the correct pair in `docs/TICKETS.md` before every commit. — Traceability; prevents the attribution bugs seen on the prior project.
 - **One ticket per commit**: never mix multiple tickets in a single commit. — Clean, revertable history.
-- **Commit/comment style**: simple, human-readable messages and comments; no phase numbers or internal codes (GSD `.planning/` docs commits are exempt and use plain `docs:` messages). — Readable history for humans.
+- **Commit/comment style**: simple, human-readable messages and comments; no phase numbers or internal codes (docs commits use plain `docs:` messages). — Readable history for humans.
 - **English-only code**: all code, identifiers, and **translation keys** in English. Slovak only in translation values. — *Critical.* Mixed-language code was a real problem before.
 - **Reuse existing UI**: when adding UI, copy the design already in the system; do not create new components or styles. — Visual consistency, lower maintenance.
 - **Backend data access**: do not call DAOs directly — use a `BaseService` method if one is available. — Respects the service-layer pattern and container-managed transactions.
@@ -65,7 +65,7 @@ Every change traces to exactly one Jira ticket, follows the existing codebase pa
 |----------|-----------|---------|
 | Open-ended ticket-driven stream (no fixed feature roadmap) | Work arrives as Jira tickets; plan each per ticket | — Pending |
 | Jira project key / commit prefix = `EP` | Project convention (EP-XXXX) | — Pending |
-| Story→Dev mapping in separate `.planning/TICKETS.md` | Keep CLAUDE.md lean; dedicated, easy-to-update table | — Pending |
+| Story→Dev mapping in separate `docs/TICKETS.md` | Keep CLAUDE.md lean; dedicated, easy-to-update table | — Pending |
 | Jira tickets read via Atlassian integration (text); images pasted by user | MCP can read text but not images | — Pending |
 | Conventions enforced in CLAUDE.md, always loaded | Guarantees every agent follows the rules | — Pending |
 | Maintain existing stack; no rewrite/migration | Brownfield production system; minimize risk | — Pending |

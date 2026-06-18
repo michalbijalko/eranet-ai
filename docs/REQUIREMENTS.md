@@ -20,7 +20,7 @@ This milestone delivers the **engineering working agreement** for ongoing, ticke
 
 ### Workflow
 
-- [ ] **FLOW-01**: A Story→Dev ticket mapping table is maintained in `.planning/TICKETS.md` and referenced from `CLAUDE.md`
+- [ ] **FLOW-01**: A Story→Dev ticket mapping table is maintained in `docs/TICKETS.md` and referenced from `CLAUDE.md`
 - [ ] **FLOW-02**: Before any discussion or planning, the relevant `EP-XXXX` Jira ticket is read via the Atlassian integration so requirements come from the ticket, not from guessing
 - [ ] **FLOW-03**: When a ticket depends on an image, the agent asks the user to paste it rather than guessing from text alone
 
