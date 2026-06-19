@@ -44,6 +44,9 @@ Review the change against SEAS standards. Focus on team-specific concerns.
 - **Backward compatibility** — existing REST URLs and JSON field names preserved (the
   AngularJS client binds to them directly); any change must be backwards-compatible or
   coordinated with a client-side update.
+- **All persist paths** — cross-cutting logic on an entity's save (sanitization, derived
+  fields, audit) is applied on every persist endpoint, not just `create()`. Some services
+  persist via several (e.g. `MessageService` has `create`, `update`, `sendDraft`).
 
 ## Output
 

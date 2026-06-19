@@ -404,4 +404,19 @@ it, or changing the column type, watch for this chain (all hit during EP-13104):
 
 ---
 
+## Server Dependency Caveats
+
+### Third-party JARs must load on Java 8 / WildFly, not just compile
+
+A WAR can build on Java 8 yet fail at class-load if a dependency contains Java 9+ bytecode.
+JBoss Modules eagerly links classes, so a Java-10 class on the classpath throws
+`UnsupportedClassVersionError` (class file 54.0 vs 52.0) at runtime even if never called.
+Verify new deps by loading them under JDK 8, not just `mvn clean package`.
+
+- Case (EP-13100): `owasp-java-html-sanitizer` 20240325.1 ships a Java-10 shim
+  (`org.owasp.shim.ForJava9AndLater`) → crash. Use **20220608.1** (last shim-free release)
+  and `<exclusion>` its transitive Guava 30.1 — the pinned Guava 18.0 has every API it calls.
+
+---
+
 *Concerns audit: 2026-06-03*
