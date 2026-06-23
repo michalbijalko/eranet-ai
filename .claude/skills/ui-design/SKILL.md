@@ -38,6 +38,10 @@ Do not introduce a new component library or redesign. Reuse what is already here
 - **No inline style attributes.** Use Bootstrap utility classes or existing SmartAdmin
   CSS classes. If a new style is genuinely needed, add it to the appropriate existing
   stylesheet, not as `style="..."` on an element.
+- **Mind ancestor-scoped theme CSS.** The same class can render differently by context —
+  e.g. `.smart-form .label` forces `display:block` + larger font. When copying an existing
+  component's look, replicate its rendering context (or the ancestor rule); identical
+  classes ≠ identical result.
 - **Localization.** All user-visible text must use `{{ 'TRANSLATION_KEY' | translate }}`
   via `angular-translate`. Translation keys in English; Slovak values in
   `publicERANET-client/app/i18n/sk.json`.

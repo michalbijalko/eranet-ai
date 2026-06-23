@@ -27,6 +27,10 @@ SEAS is a public-procurement platform with legal obligations. These rules are ma
 - For new endpoints, always ask: who can call this? If there are multiple roles with
   different access levels, check whether any existing role/group enum value applies before
   creating new ones.
+- Suppliers write messages. Communication/messaging endpoints (and anything attached to
+  them, e.g. message tags) must allow BOTH `SystemUserGroup.ROLE_NAME_USER` and
+  `ROLE_NAME_SUPPLIER` — a default USER-only `@RolesAllowed` locks suppliers out with an
+  `EJBAccessException` at call time.
 
 ## Input sanitization
 

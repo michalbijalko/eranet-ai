@@ -25,6 +25,7 @@ Before touching code, ensure the following are in place.
 - Add `@Path`, `@Produces(MediaType.APPLICATION_JSON)`, `@Consumes(MediaType.APPLICATION_JSON)` to the service class.
 - Register the new service class in `ApplicationConfig.java` (`getClasses()` set).
 - Apply `@RolesAllowed(SystemUserGroup.ROLE_NAME_USER)` to the class; use `@PermitAll` only for genuinely public endpoints.
+- Register every new `@Entity` in `persistence.xml` (`<class>…</class>`). A successful Maven build is NOT enough — an unlisted entity only fails at deploy (EclipseLink "uses a non-entity … as target entity" at WildFly startup).
 
 ## Adding a new AngularJS screen
 

@@ -14,6 +14,7 @@ smoke testing catches visual regressions and server integration issues.
 
 - **Framework:** Karma `~0.12.31` with Jasmine (`publicERANET-client/karma.conf.js`).
 - **Run:** `grunt test` from `publicERANET-client/` — runs JSHint + Karma.
+- **Caveat:** the pinned Karma (`~0.12`) + socket.io 0.9 stack crashes on modern Node (18+/24, `EventEmitter.prototype` removed), so `grunt test` only runs on the legacy Node toolchain. On modern Node, validate specs by reading and run them on a compatible Node/CI.
 - **Test files:** `publicERANET-client/test/spec/` — mirror the `app/scripts/` structure.
 - **Jasmine globals** available in tests: `describe`, `it`, `expect`, `beforeEach`,
   `afterEach`, `inject`, `spyOn`, `jasmine`, `browser`.
