@@ -27,6 +27,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 | CKEditor in communication | `EP-13100` | `EP-13108` |
 | Tags ("Štítky") in communication | `EP-13103` | `EP-13112` |
 | Old-message formatting fix after CKEditor | `EP-13100` | `EP-13187` |
+| Supplier view: hide message tags | `EP-13103` | `EP-13188` |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
