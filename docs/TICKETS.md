@@ -29,6 +29,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 | Old-message formatting fix after CKEditor | `EP-13100` | `EP-13187` |
 | Supplier view: hide message tags | `EP-13103` | `EP-13188` |
 | Message tags: role/context logic | `EP-13103` | `EP-13189` |
+| Observer can reply to message (tag reconcile fix) | `EP-13103` | `EP-13229` |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
