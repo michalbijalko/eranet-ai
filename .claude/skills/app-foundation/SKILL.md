@@ -1,11 +1,11 @@
 ---
 name: app-foundation
-description: What every new module or feature area in SEAS needs before feature work begins - correct layer setup, dev environment running, migrations in place, and existing patterns followed. Use whenever adding a new Java service, a new AngularJS screen area, or setting up a fresh dev environment. Apply early; these are prerequisites, not features.
+description: What every new module or feature area in VSE needs before feature work begins - correct layer setup, dev environment running, migrations in place, and existing patterns followed. Use whenever adding a new Java service, a new AngularJS screen area, or setting up a fresh dev environment. Apply early; these are prerequisites, not features.
 ---
 
-# Module / feature foundation (SEAS)
+# Module / feature foundation (VSE)
 
-SEAS is a brownfield system. We extend it ticket by ticket — no new frameworks or rewrites.
+VSE is a brownfield system. We extend it ticket by ticket — no new frameworks or rewrites.
 Before touching code, ensure the following are in place.
 
 ## Dev environment checklist

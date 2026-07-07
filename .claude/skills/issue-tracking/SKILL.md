@@ -8,7 +8,7 @@ description: How we track work in Jira (EP project) - reading tickets before cod
 **Project key:** `EP` (e.g., `EP-12688`)
 
 Every code change traces to exactly one Jira ticket. This is not optional — it is the
-core discipline of SEAS development.
+core discipline of VSE development.
 
 ## Before writing any code
 

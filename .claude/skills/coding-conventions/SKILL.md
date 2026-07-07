@@ -1,6 +1,6 @@
 ---
 name: coding-conventions
-description: SEAS codebase conventions - JavaScript (AngularJS 1.5 ES5) and Java (Java EE 7). Use whenever writing, editing, refactoring, or reviewing code. Apply so generated code fits the existing codebase and reads as if written by the team.
+description: VSE codebase conventions - JavaScript (AngularJS 1.5 ES5) and Java (Java EE 7). Use whenever writing, editing, refactoring, or reviewing code. Apply so generated code fits the existing codebase and reads as if written by the team.
 ---
 
 # Coding conventions

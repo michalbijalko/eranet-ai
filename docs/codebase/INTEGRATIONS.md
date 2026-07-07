@@ -6,7 +6,7 @@
 
 ## Domain Context
 
-This system is a **Slovak public-procurement management platform** (ERANET / SEAS — "Systém riadenia obstarávaní"). The domain involves:
+This system is a **Slovak public-procurement management platform** (ERANET / VSE — "Systém riadenia obstarávaní"). The domain involves:
 - Procurement tenders and qualification systems (supplier management)
 - Electronic auctions with real-time bidding
 - Document generation and archiving

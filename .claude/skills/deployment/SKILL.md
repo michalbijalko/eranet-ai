@@ -1,11 +1,11 @@
 ---
 name: deploy
-description: SEAS release process - Maven WAR build, WildFly deployment, and Liquibase migrations. Invoke manually when deploying a change. Do NOT run automatically.
+description: VSE release process - Maven WAR build, WildFly deployment, and Liquibase migrations. Invoke manually when deploying a change. Do NOT run automatically.
 disable-model-invocation: true
 argument-hint: [environment]
 ---
 
-# Deploy / release (SEAS)
+# Deploy / release (VSE)
 
 Manual only — never deploy because code "looks ready." A human invokes this.
 

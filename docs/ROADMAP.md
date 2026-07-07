@@ -1,6 +1,6 @@
-# Roadmap: SEAS / ERANET — Ticket-Driven Development
+# Roadmap: VSE / ERANET — Ticket-Driven Development
 
-**Project:** SEAS / ERANET — Ticket-Driven Development
+**Project:** VSE / ERANET — Ticket-Driven Development
 **Granularity:** Coarse
 **Mode:** MVP
 **Coverage:** 11/11 requirements mapped

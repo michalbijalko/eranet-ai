@@ -1,11 +1,11 @@
 ---
 name: authentication
-description: How authentication works in SEAS - local username/password, SAML 2.0 SSO via slovensko.sk (ÚPVS), and OIDC/OAuth2. Use whenever touching login flows, session handling, protected endpoints, or SSO. Do not reinvent — work with the existing AuthenticationService and OIDCService.
+description: How authentication works in VSE - local username/password, SAML 2.0 SSO via slovensko.sk (ÚPVS), and OIDC/OAuth2. Use whenever touching login flows, session handling, protected endpoints, or SSO. Do not reinvent — work with the existing AuthenticationService and OIDCService.
 ---
 
 # Authentication
 
-SEAS supports three authentication mechanisms, all implemented in the existing codebase.
+VSE supports three authentication mechanisms, all implemented in the existing codebase.
 Do not build a new auth system — extend or fix the existing one.
 
 ## Mechanisms

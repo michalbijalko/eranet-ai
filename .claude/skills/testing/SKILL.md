@@ -1,11 +1,11 @@
 ---
 name: testing
-description: How we test SEAS - Karma/Jasmine unit tests for the AngularJS client, manual smoke testing in the browser. Use whenever writing tests, verifying a change, checking for regressions, or when the user mentions "testy", "regresné testy", "smoke test", "pretestovať".
+description: How we test VSE - Karma/Jasmine unit tests for the AngularJS client, manual smoke testing in the browser. Use whenever writing tests, verifying a change, checking for regressions, or when the user mentions "testy", "regresné testy", "smoke test", "pretestovať".
 ---
 
 # Testing
 
-SEAS ships many small ticket-driven changes. Unit tests cover client-side logic; browser
+VSE ships many small ticket-driven changes. Unit tests cover client-side logic; browser
 smoke testing catches visual regressions and server integration issues.
 
 ## Layers
