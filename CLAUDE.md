@@ -102,6 +102,7 @@ These skills encode SEAS-specific rules for each activity. **Read the relevant s
 | `documentation` | Writing or updating docs | What to produce, format (`docs/` or Nuklino), keep in sync with code changes |
 | `demo-material` | Preparing a stakeholder demo | Demo script, per-step talking points, demo data setup, screenshots |
 | `client-training` | Creating training guides for end users | Step-by-step guides in Slovak, with screenshots, organized by user task |
+| `instance-setup` | Setting up a fresh client-instance branch | Rebrand the instance label, reset the previous client's plans/tickets, refresh client-variable codebase docs from the nested repos |
 
 ## Agents (`.claude/agents/`)
 
