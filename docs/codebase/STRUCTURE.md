@@ -51,16 +51,16 @@ vse/                              # Workspace root
     │   │   ├── java/sk/innovis/eranetpublic/server/
     │   │   │   ├── annotation/       # Custom JAX-RS annotations (PATCH.java)
     │   │   │   ├── configuration/    # Config beans (OIDC, Mail, Auction)
-    │   │   │   ├── dao/              # JPA DAOs (~128 files + helpDto/)
+    │   │   │   ├── dao/              # JPA DAOs (~139 files + helpDto/)
     │   │   │   │   └── helpDto/      # Query helpers: FindParameters, FindResult, etc.
-    │   │   │   ├── dto/              # JPA @Entity classes (~208 files)
+    │   │   │   ├── dto/              # JPA @Entity classes (~218 files)
     │   │   │   │   └── face/         # Interfaces: HasId, HasCopy, IsProcurement
     │   │   │   ├── exception/        # JAX-RS exception mapper
     │   │   │   ├── interceptor/      # JAX-RS request interceptors
     │   │   │   ├── saml/             # SAML 2.0 client
     │   │   │   ├── serialization/    # Jackson providers, XML adapters
     │   │   │   │   └── dto/          # Serialization-specific DTOs (Proebiz, statistics)
-    │   │   │   ├── service/          # REST+EJB service classes (~166 files)
+    │   │   │   ├── service/          # REST+EJB service classes (~188 files)
     │   │   │   │   ├── comparator/   # Comparator helpers
     │   │   │   │   ├── enums/        # Shared enums
     │   │   │   │   ├── excel/        # Excel export logic
@@ -129,16 +129,16 @@ vse/                              # Workspace root
 
 **`publicERANET-server/src/main/java/.../service/`:**
 - Purpose: All JAX-RS REST endpoints + EJB business logic (merged)
-- Contains: 166 `*Service.java` files; `ApplicationConfig.java` registers all of them explicitly
+- Contains: 188 `*Service.java` files; `ApplicationConfig.java` registers all of them explicitly
 - Subdirectories: `pdf/` (11 PDF services), `supplier/` (2 supplier-specific services), `excel/`, `logic/`, `comparator/`, `enums/`, `help/`
 
 **`publicERANET-server/src/main/java/.../dao/`:**
 - Purpose: JPA data access via EclipseLink; `BaseDao<T>` provides generic CRUD + criteria queries
-- Contains: 128 DAO files; `helpDto/` holds query helper objects (`FindParameters`, `FindResult`, `QueryFilter`, `OrderByField`)
+- Contains: 139 DAO files; `helpDto/` holds query helper objects (`FindParameters`, `FindResult`, `QueryFilter`, `OrderByField`)
 
 **`publicERANET-server/src/main/java/.../dto/`:**
 - Purpose: JPA `@Entity` classes for all domain objects; double as JSON response bodies
-- Contains: 208 entity classes; `face/` contains interfaces (`HasId`, `HasCopy`, `IsProcurement`) used for generic copy/clone operations in BaseService
+- Contains: 218 entity classes; `face/` contains interfaces (`HasId`, `HasCopy`, `IsProcurement`) used for generic copy/clone operations in BaseService
 
 **`publicERANET-server/src/main/sql/`:**
 - Purpose: Versioned SQL migration scripts organized by version number (1.2 through 2.11.0)

@@ -12,7 +12,7 @@
 - **Issue:** The entire frontend is built on AngularJS 1.5.11 (confirmed via `publicERANET-client/app/bower_components/angular/angular.js` header). AngularJS reached end-of-life in December 2021. No security patches, no browser-compatibility fixes, and no community support will be issued.
 - **Files:** `publicERANET-client/bower.json` (`"angular": "~1.5.5"`), all of `publicERANET-client/app/scripts/`
 - **Impact:** Any future browser security changes or JavaScript engine updates may silently break the application. CVEs discovered in AngularJS will not be patched upstream.
-- **Fix approach:** Full migration to Angular 2+ (or React/Vue). This is a multi-sprint effort requiring a complete rewrite of the 643-file JS codebase under `publicERANET-client/app/scripts/`.
+- **Fix approach:** Full migration to Angular 2+ (or React/Vue). This is a multi-sprint effort requiring a complete rewrite of the 679-file JS codebase under `publicERANET-client/app/scripts/`.
 
 ### Bower (Deprecated)
 
@@ -298,14 +298,14 @@
 
 ### No Java Unit or Integration Tests
 
-- **What's not tested:** The entire `publicERANET-server` backend — 823 Java source files, all REST endpoints, all business logic.
+- **What's not tested:** The entire `publicERANET-server` backend — 889 Java source files, all REST endpoints, all business logic.
 - **Files:** `publicERANET-server/src/test/java/` directory exists but is empty.
 - **Risk:** Any refactoring, dependency upgrade, or bug fix has no automated regression safety net.
 - **Priority:** HIGH
 
 ### Frontend Tests Are a Stub
 
-- **What's not tested:** All 368 AngularJS controller files, all services, all directives.
+- **What's not tested:** All 389 AngularJS controller files, all services, all directives.
 - **Files:** Only `publicERANET-client/test/spec/controllers/main.js` exists (yeoman scaffold boilerplate).
 - **Risk:** UI regressions are undetectable programmatically.
 - **Priority:** MEDIUM
@@ -347,7 +347,7 @@
 ### No Frontend Build Minification in Development
 
 - **Severity:** LOW
-- **Problem:** The `app/scripts/` directory contains 643 unminified JavaScript files loaded individually in development. The bundled build (`dist/`) would be needed for production performance, but the Grunt build tooling is frozen at 2013 vintage.
+- **Problem:** The `app/scripts/` directory contains 679 unminified JavaScript files loaded individually in development. The bundled build (`dist/`) would be needed for production performance, but the Grunt build tooling is frozen at 2013 vintage.
 
 ---
 

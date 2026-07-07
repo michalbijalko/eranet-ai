@@ -34,7 +34,7 @@
 │  `src/main/java/sk/innovis/eranetpublic/server/dao/*Dao.java`        │
 │                                                                      │
 │  JPA Entities / DTOs                                                 │
-│  `src/main/java/sk/innovis/eranetpublic/server/dto/*.java` (208 cls)│
+│  `src/main/java/sk/innovis/eranetpublic/server/dto/*.java` (218 cls)│
 └──────────────────────────────────────────────────────────────────────┘
                               │  JTA / JDBC
                               ▼
@@ -58,10 +58,10 @@
 | Angular filters | Display formatting (status icons, numeric, date) | `publicERANET-client/app/scripts/filters.js` |
 | `ApplicationConfig.java` | JAX-RS `Application` subclass — registers all REST resource classes | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ApplicationConfig.java` |
 | `BaseService<T>` | Abstract ancestor for all REST services: date formats, EJB injection, find/copy helpers | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/BaseService.java` |
-| Concrete `*Service.java` | `@Stateless` EJBs annotated with `@Path`: expose CRUD + query endpoints for each domain object | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/*.java` (166 files) |
+| Concrete `*Service.java` | `@Stateless` EJBs annotated with `@Path`: expose CRUD + query endpoints for each domain object | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/*.java` (188 files) |
 | `BaseDao<T>` | Generic JPA CRUD, criteria-builder queries, pagination | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/BaseDao.java` |
-| Concrete `*Dao.java` | Entity-specific queries extending BaseDao | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/*.java` (128 files) |
-| JPA entities / DTOs | `@Entity` classes mapped to MySQL tables; also serialized directly as JSON responses | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dto/*.java` (208 classes) |
+| Concrete `*Dao.java` | Entity-specific queries extending BaseDao | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/*.java` (139 files) |
+| JPA entities / DTOs | `@Entity` classes mapped to MySQL tables; also serialized directly as JSON responses | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dto/*.java` (218 classes) |
 | `AuthenticationService` | Form-login, SAML/OIDC SSO, password reset, registration | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/AuthenticationService.java` |
 | `OIDCService` | OpenID Connect / JWT token handling using Nimbus JOSE | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/OIDCService.java` |
 | SAML/SSO | ÚPVS government SSO + VSE/eID (Azure AD) SSO | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/` (`UpvsSsoService.java`, `VseSsoService.java`) |
@@ -118,21 +118,21 @@
 **Server — REST/EJB Service Layer:**
 - Purpose: HTTP endpoints + business logic in a single `@Stateless @Path` class; handles authorization, calls DAOs, sends emails
 - Location: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/`
-- Contains: 166 service files; all extend `BaseService<T>`
+- Contains: 188 service files; all extend `BaseService<T>`
 - Depends on: DAO layer via `@EJB` injection; `EntityManager` indirectly via DAOs
 - Used by: JAX-RS container via `ApplicationConfig.java`
 
 **Server — DAO Layer:**
 - Purpose: JPA/EclipseLink data access; `BaseDao<T>` provides generic CRUD, pagination, criteria-builder queries
 - Location: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/`
-- Contains: 128 DAO files; all extend `BaseDao<T>`
+- Contains: 139 DAO files; all extend `BaseDao<T>`
 - Depends on: `EntityManager` (`@PersistenceContext(name="PublicPU")`)
 - Used by: Service layer via `@EJB`
 
 **Server — Entity (DTO) Layer:**
 - Purpose: `@Entity` JPA classes mapped to MySQL; also serialized as JSON responses via Jackson
 - Location: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dto/`
-- Contains: 208 entity classes; registered explicitly in `persistence.xml`
+- Contains: 218 entity classes; registered explicitly in `persistence.xml`
 - Depends on: EclipseLink, Jackson, Apache Commons BeanUtils (for copy/clone helpers)
 
 ## Data Flow
@@ -208,7 +208,7 @@
 - GlassFish deployment: `publicERANET-server/src/main/webapp/WEB-INF/glassfish-web.xml` (context root `/public`, alternatedocroot for client files)
 - WildFly/JBoss deployment: `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml` (context root `/public_vse`, security domain `EranetVseTestRM`)
 - JAX-RS app class: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ApplicationConfig.java` (`@ApplicationPath("webresources")`)
-- JPA config: `publicERANET-server/src/main/resources/META-INF/persistence.xml` (persistence unit `PublicTestPU`, JTA data source `EranetVseTestDS`, EclipseLink, 230+ entity registrations)
+- JPA config: `publicERANET-server/src/main/resources/META-INF/persistence.xml` (persistence unit `PublicTestPU`, JTA data source `EranetVseTestDS`, EclipseLink, 236 class registrations)
 - JDBC pool setup: `publicERANET-server/src/main/setup/glassfish-resources.xml` (MySQL, database `public`, JNDI `PublicDS`)
 - CDI beans: `publicERANET-server/src/main/webapp/WEB-INF/beans.xml`
 
