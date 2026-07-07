@@ -67,7 +67,7 @@
 
 - **Severity:** HIGH
 - **Issue:** `configS.bat` (project root) contains a Liquibase migration command with the database root password in plaintext in the `--password` flag.
-- **File:** `C:\Innovis\seas_test\configS.bat`
+- **File:** `C:\Innovis\trnavavuc\configS.bat`
 - **Impact:** The database root password is stored in a committed script. It is also used with `&ssl=false`, disabling TLS for the MySQL connection.
 - **Fix approach:** Use a Liquibase `.properties` file (excluded from version control) or environment variable substitution. Enable SSL/TLS on the MySQL connection.
 

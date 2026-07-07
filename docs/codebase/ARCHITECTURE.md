@@ -39,7 +39,7 @@
                               │  JTA / JDBC
                               ▼
 ┌──────────────────────────────────────────────────────────────────────┐
-│   MySQL database  (JNDI: PublicSeasDS / PublicDS)                    │
+│   MySQL database  (JNDI: PublicTrnavavucDS / PublicDS)                    │
 │   Persistence unit: PublicTestPU                                     │
 │   `src/main/resources/META-INF/persistence.xml`                      │
 └──────────────────────────────────────────────────────────────────────┘
@@ -142,11 +142,11 @@
 1. Browser calls `ng-app` bootstrap → `eranetPublic` module loaded from `publicERANET-client/app/scripts/ng.app.js`
 2. Route change → controller instantiated, calls `XyzResource.query(postData)` in `scripts/service/resources/xyz.js`
 3. Angular `$resource` issues `POST webresources/sc/xyz/query` (or `GET/PUT/DELETE` for others)
-4. HTTP request crosses to GlassFish WAR context `/public` (or `/public_seas` on WildFly)
+4. HTTP request crosses to GlassFish WAR context `/public` (or `/public_trnavavuc` on WildFly)
 5. `FindParametersSanitizer` interceptor (`interceptor/FindParametersSanitizer.java`) sanitizes query parameters
 6. `ApplicationConfig.addRestResources()` routes request to correct `XyzService.java` method
 7. `XyzService` (EJB `@Stateless`) validates auth via Java EE `@RolesAllowed`, delegates to `XyzDao.java`
-8. `XyzDao` uses `EntityManager` (EclipseLink, JTA data source `PublicSeasDS`) to query MySQL
+8. `XyzDao` uses `EntityManager` (EclipseLink, JTA data source `PublicTrnavavucDS`) to query MySQL
 9. Entity returned → Jackson serializes to JSON → response sent to client
 10. Angular `$resource` resolves promise → controller updates `$scope` → Angular digest cycle re-renders view
 
@@ -161,7 +161,7 @@
 
 1. Unauthenticated user sees `views/login.html` (controlled by `$root.logged` flag in `ng.app.js`)
 2. Credentials posted to `webresources/auth/login` (`AuthenticationService.java`)
-3. Server validates via Java EE FORM login realm `PublicSeasRM`; SAML SSO via `SAMLClient` (`saml/`); OIDC via `OIDCService.java` with Nimbus JOSE
+3. Server validates via Java EE FORM login realm `PublicTrnavavucRM`; SAML SSO via `SAMLClient` (`saml/`); OIDC via `OIDCService.java` with Nimbus JOSE
 4. On success, `$root.logged = true`; `$rootScope.currentUser` populated
 5. Logout: `webresources/auth/logout` → `window.location.href = result.content` redirect
 
@@ -206,9 +206,9 @@
 **Server WAR:**
 - Deployment descriptor: `publicERANET-server/src/main/webapp/WEB-INF/web.xml` (servlet 3.0, FORM auth, session timeout 30 min)
 - GlassFish deployment: `publicERANET-server/src/main/webapp/WEB-INF/glassfish-web.xml` (context root `/public`, alternatedocroot for client files)
-- WildFly/JBoss deployment: `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml` (context root `/public_seas`, security domain `PublicSeasRM`)
+- WildFly/JBoss deployment: `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml` (context root `/public_trnavavuc`, security domain `PublicTrnavavucRM`)
 - JAX-RS app class: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ApplicationConfig.java` (`@ApplicationPath("webresources")`)
-- JPA config: `publicERANET-server/src/main/resources/META-INF/persistence.xml` (persistence unit `PublicTestPU`, JTA data source `PublicSeasDS`, EclipseLink, 230+ entity registrations)
+- JPA config: `publicERANET-server/src/main/resources/META-INF/persistence.xml` (persistence unit `PublicTestPU`, JTA data source `PublicTrnavavucDS`, EclipseLink, 230+ entity registrations)
 - JDBC pool setup: `publicERANET-server/src/main/setup/glassfish-resources.xml` (MySQL, database `public`, JNDI `PublicDS`)
 - CDI beans: `publicERANET-server/src/main/webapp/WEB-INF/beans.xml`
 

@@ -1,8 +1,8 @@
-# SEAS / ERANET — Ticket-Driven Development
+# TTSK / ERANET — Ticket-Driven Development
 
 ## What This Is
 
-SEAS (ERANET Public) is a production Slovak public-procurement (e-tender) platform: a Java EE 7 REST/WebSocket backend (`publicERANET-server`) and an AngularJS 1.x SPA (`publicERANET-client`), backed by MySQL. This milestone is not a rewrite — it is an **ongoing, Jira-ticket-driven stream of new features and bug fixes** on the existing system, governed by a strict set of engineering conventions so that AI-assisted changes stay consistent, traceable, and faithful to the existing codebase.
+TTSK (ERANET Public) is a production Slovak public-procurement (e-tender) platform: a Java EE 7 REST/WebSocket backend (`publicERANET-server`) and an AngularJS 1.x SPA (`publicERANET-client`), backed by MySQL. This milestone is not a rewrite — it is an **ongoing, Jira-ticket-driven stream of new features and bug fixes** on the existing system, governed by a strict set of engineering conventions so that AI-assisted changes stay consistent, traceable, and faithful to the existing codebase.
 
 ## Core Value
 

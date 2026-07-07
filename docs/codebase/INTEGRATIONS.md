@@ -6,7 +6,7 @@
 
 ## Domain Context
 
-This system is a **Slovak public-procurement management platform** (ERANET / SEAS — "Systém riadenia obstarávaní"). The domain involves:
+This system is a **Slovak public-procurement management platform** (ERANET / TTSK — "Systém riadenia obstarávaní"). The domain involves:
 - Procurement tenders and qualification systems (supplier management)
 - Electronic auctions with real-time bidding
 - Document generation and archiving
@@ -54,7 +54,7 @@ This system is a **Slovak public-procurement management platform** (ERANET / SEA
 - **Type:** MySQL 5.7
 - **Container name:** `eranet_mysql`
 - **Database name:** `eranet_db`
-- **JTA data source JNDI:** `PublicSeasDS` (WildFly) / `PublicDS` (GlassFish legacy)
+- **JTA data source JNDI:** `PublicTrnavavucDS` (WildFly) / `PublicDS` (GlassFish legacy)
 - **Port (Docker):** `${MYSQL_PORT:-3307}:3306`
 - **Config:** `publicERANET-server/docker-compose.yml`
 - **Charset:** `utf8mb4`, collation `utf8mb4_slovak_ci`
@@ -177,7 +177,7 @@ Used extensively throughout the codebase for:
 
 - Liquibase CLI (external tool, not Maven-managed)
 - Run via `configS.bat` at project root
-- Connects to `localhost:3306/seas_test` with the WildFly-bundled MySQL connector (`mysql-connector-java-8.0.22.jar`)
+- Connects to `localhost:3306/public_trnavavuc` with the WildFly-bundled MySQL connector (`mysql-connector-java-8.0.22.jar`)
 
 ### Containerisation
 

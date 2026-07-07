@@ -6,7 +6,7 @@
 ## Directory Layout
 
 ```
-seas_test/                        # Workspace root
+trnavavuc/                        # Workspace root
 ├── configS.bat                   # Windows setup script
 ├── publicERANET-client/          # AngularJS 1.x SPA subproject (Git repo)
 │   ├── app/                      # Deployable SPA root
@@ -95,7 +95,7 @@ seas_test/                        # Workspace root
         └── com/aspose/               # aspose-words, aspose-pdf, aspose-email, aspose-cells
 ```
 
-> **Git topology:** three independent repos — the two subprojects (each on branch `seas-test`) and the workspace-root/umbrella repo holding `docs/`, `.claude/`, `CLAUDE.md` (branch `master`). Code is committed in its subproject repo; docs and guidance in the umbrella. The `publicERANET-*` dirs are nested repos — never add them from the umbrella.
+> **Git topology:** three independent repos — the two subprojects (each on branch `trnavavuc_test`) and the workspace-root/umbrella repo holding `docs/`, `.claude/`, `CLAUDE.md` (branch `master`). Code is committed in its subproject repo; docs and guidance in the umbrella. The `publicERANET-*` dirs are nested repos — never add them from the umbrella.
 
 ## Directory Purposes
 
@@ -155,7 +155,7 @@ seas_test/                        # Workspace root
 - `publicERANET-server/src/main/setup/glassfish-resources.xml`: JDBC pool, MySQL connection properties
 - `publicERANET-server/src/main/webapp/WEB-INF/web.xml`: Servlet descriptor, security roles, session config
 - `publicERANET-server/src/main/webapp/WEB-INF/glassfish-web.xml`: GlassFish deployment — context root `/public`, client static file path
-- `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml`: WildFly deployment — context root `/public_seas`
+- `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml`: WildFly deployment — context root `/public_trnavavuc`
 - `publicERANET-client/app/scripts/config.js`: Angular `config` module with build timestamp constant
 - `publicERANET-client/Gruntfile.js`: Build pipeline (concat, uglify, copy, ngconstant for config.js)
 - `publicERANET-client/bower.json`: Front-end dependency manifest

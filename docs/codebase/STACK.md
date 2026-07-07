@@ -124,7 +124,7 @@ Scaffolded from `generator-angular 0.8.0` (Yeoman), noted at top of `publicERANE
 ### Build Tool
 
 **Maven** — `publicERANET-server/pom.xml`
-- Group: `sk.innovis`, Artifact: `eranet-server-seastest`, Version: `1.0-SNAPSHOT`
+- Group: `sk.innovis`, Artifact: `eranet-server-trnavavuctest`, Version: `1.0-SNAPSHOT`
 - Packaging: **WAR**
 - In-project local repo: `publicERANET-server/lib/` (hosts Aspose commercial JARs)
 - Central repo: `https://repo1.maven.org/maven2`
@@ -133,13 +133,13 @@ Scaffolded from `generator-angular 0.8.0` (Yeoman), noted at top of `publicERANE
 | Plugin | Version | Purpose |
 |--------|---------|---------|
 | `maven-compiler-plugin` | 3.1 | Compile Java 8, run Lombok annotation processing |
-| `maven-war-plugin` | 2.3 | Package WAR, bundle SQL into `WEB-INF/sql/`, set logging profile `seas_profile` |
+| `maven-war-plugin` | 2.3 | Package WAR, bundle SQL into `WEB-INF/sql/`, set logging profile `trnavavuc_profile` |
 | `maven-dependency-plugin` | 2.6 | Copy endorsed JARs |
 | `eclipselink-staticweave-maven-plugin` | 1.0.3 | EclipseLink static weaving for JPA entities |
 
 ### Application Server
 
-**Target Runtime:** WildFly 26.1.3 (JNDI name pattern `PublicSeasDS` in `persistence.xml`; WildFly path referenced in `configS.bat`)
+**Target Runtime:** WildFly 26.1.3 (JNDI name pattern `PublicTrnavavucDS` in `persistence.xml`; WildFly path referenced in `configS.bat`)
 - Originally also configured for GlassFish (legacy `publicERANET-server/src/main/setup/glassfish-resources.xml`)
 - Application context path: `/webresources` (`@ApplicationPath("webresources")` in `ApplicationConfig.java`)
 
@@ -159,7 +159,7 @@ Scaffolded from `generator-angular 0.8.0` (Yeoman), noted at top of `publicERANE
 
 **JPA Provider:** EclipseLink `2.6.4` — `publicERANET-server/pom.xml`
 - Persistence unit: `PublicTestPU` (JTA)
-- JTA data source JNDI: `PublicSeasDS`
+- JTA data source JNDI: `PublicTrnavavucDS`
 - Static weaving enabled (`eclipselink.weaving=static`, `eclipselink.target-server=JBoss`)
 - Persistence descriptor: `publicERANET-server/src/main/resources/META-INF/persistence.xml`
 - 130+ entity classes under package `sk.innovis.eranetpublic.server.dto`
@@ -229,7 +229,7 @@ License: `publicERANET-server/src/main/resources/META-INF/Aspose.Total.Java.lic`
 - Build-time config injected into `dist/scripts/config.js` via `grunt-ng-constant` (`publicERANET-client/Gruntfile.js` `ngconstant` task)
 
 **Logging:**
-- Server: WildFly logging profile `seas_profile` set via `MANIFEST.MF` (`maven-war-plugin` configuration)
+- Server: WildFly logging profile `trnavavuc_profile` set via `MANIFEST.MF` (`maven-war-plugin` configuration)
 
 ---
 
