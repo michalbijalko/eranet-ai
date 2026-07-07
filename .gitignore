@@ -1,3 +1,6 @@
 # Nested application repositories (kept as separate git repos, not tracked here)
 publicERANET-client/
 publicERANET-server/
+
+# Local dev config scripts — contain machine-specific paths and DB credentials
+config*.bat
