@@ -1,13 +1,13 @@
 ---
 name: feasibility
-description: Quick discovery / feasibility (go-no-go) pass before committing to build - understand what the ticket/client wants, research how it could be done in the SEAS stack, judge whether it's doable and worth it, and give a recommendation. Use at the very start of a new idea or theme, or when the user mentions "feasibility", "go-no-go", "prieskum", "dá sa to vôbec urobiť", "discovery", "oplatí sa to". Runs before planning the real build; the business owner makes the final call.
+description: Quick discovery / feasibility (go-no-go) pass before committing to build - understand what the ticket/client wants, research how it could be done in the TTSK stack, judge whether it's doable and worth it, and give a recommendation. Use at the very start of a new idea or theme, or when the user mentions "feasibility", "go-no-go", "prieskum", "dá sa to vôbec urobiť", "discovery", "oplatí sa to". Runs before planning the real build; the business owner makes the final call.
 ---
 
 # Feasibility / discovery (go-no-go)
 
 The first step for a brand-new idea we don't yet understand. Before planning or building,
 do a quick research pass to answer: **what does the client/ticket actually want, can we do
-it within the SEAS stack, and is it worth doing?** Output is a recommendation, not code.
+it within the TTSK stack, and is it worth doing?** Output is a recommendation, not code.
 
 ## What to do
 

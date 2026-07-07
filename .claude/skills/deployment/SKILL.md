@@ -1,18 +1,18 @@
 ---
 name: deploy
-description: SEAS release process - Maven WAR build, WildFly deployment, and Liquibase migrations. Invoke manually when deploying a change. Do NOT run automatically.
+description: TTSK release process - Maven WAR build, WildFly deployment, and Liquibase migrations. Invoke manually when deploying a change. Do NOT run automatically.
 disable-model-invocation: true
 argument-hint: [environment]
 ---
 
-# Deploy / release (SEAS)
+# Deploy / release (TTSK)
 
 Manual only — never deploy because code "looks ready." A human invokes this.
 
 ## Stack
 
 - **Server:** Java EE 7 WAR deployed on **WildFly 26.1.3**.
-- **Build:** Maven (`mvn clean package` produces `publicERANET-server/target/eranet-server-seastest-1.0-SNAPSHOT.war`).
+- **Build:** Maven (`mvn clean package` produces `publicERANET-server/target/eranet-server-trnavavuctest-1.0-SNAPSHOT.war`).
 - **Client:** Grunt (`grunt build` produces `publicERANET-client/dist/`).
 - **Database migrations:** Liquibase CLI via `configS.bat` at project root.
 - **DB containers:** MySQL 5.7 via Docker Compose in `publicERANET-server/`.
@@ -44,11 +44,11 @@ Always run migrations **before** deploying the new WAR.
 
 Hot-deploy: copy (or replace) the WAR into WildFly's `deployments/` folder.
 ```bash
-cp publicERANET-server/target/eranet-server-seastest-1.0-SNAPSHOT.war \
+cp publicERANET-server/target/eranet-server-trnavavuctest-1.0-SNAPSHOT.war \
    <WILDFLY_HOME>/standalone/deployments/
 ```
 WildFly detects the new WAR and redeploys automatically. Check the log for
-`Deployed "eranet-server-seastest-1.0-SNAPSHOT.war"`.
+`Deployed "eranet-server-trnavavuctest-1.0-SNAPSHOT.war"`.
 
 **5. Verify**
 
@@ -71,7 +71,7 @@ cd publicERANET-client && grunt serve
 
 | Symptom | Fix |
 |---------|-----|
-| WAR won't start, JNDI lookup fails | Check WildFly data source `PublicSeasDS` is configured and MySQL is up |
+| WAR won't start, JNDI lookup fails | Check WildFly data source `PublicTrnavavucDS` is configured and MySQL is up |
 | `Aspose.Total.Java.lic` error at startup | Ensure the license file is in `META-INF/` (it is committed; check the build includes it) |
 | Liquibase error on migration | Check changelog XML for the new changeset; verify DB connection in `configS.bat` |
 | Client gives 404 for `webresources/sc/...` | WildFly not running or WAR not deployed; check WildFly admin console |

@@ -1,11 +1,11 @@
 ---
 name: ui-design
-description: How to build UI in SEAS - Bootstrap 3 + SmartAdmin theme + AngularJS Bootstrap (ui.bootstrap). Use whenever building, styling, or restyling any UI - components, pages, layouts, forms, tables - or when the user mentions "dizajn", "UI", "vzhľad", "komponenty", "frontend look". Always reuse existing components; never hand-roll CSS to fake the look.
+description: How to build UI in TTSK - Bootstrap 3 + SmartAdmin theme + AngularJS Bootstrap (ui.bootstrap). Use whenever building, styling, or restyling any UI - components, pages, layouts, forms, tables - or when the user mentions "dizajn", "UI", "vzhľad", "komponenty", "frontend look". Always reuse existing components; never hand-roll CSS to fake the look.
 ---
 
-# UI & design system (SEAS)
+# UI & design system (TTSK)
 
-SEAS uses **Bootstrap 3** + the **SmartAdmin** jQuery admin theme + **AngularJS Bootstrap
+TTSK uses **Bootstrap 3** + the **SmartAdmin** jQuery admin theme + **AngularJS Bootstrap
 (`ui.bootstrap`)** for all UI. The look is data-dense: tables, forms, and dashboards.
 Do not introduce a new component library or redesign. Reuse what is already here.
 

@@ -1,11 +1,11 @@
 ---
 name: security
-description: Security guidelines for SEAS - role-based access, secrets handling, input sanitization, and the rule that sensitive config never lives in code. Use whenever adding endpoints, handling credentials, integrating external systems, or when the user mentions "security", "oprávnenia", "API kľúč", "roly".
+description: Security guidelines for TTSK - role-based access, secrets handling, input sanitization, and the rule that sensitive config never lives in code. Use whenever adding endpoints, handling credentials, integrating external systems, or when the user mentions "security", "oprávnenia", "API kľúč", "roly".
 ---
 
 # Security
 
-SEAS is a public-procurement platform with legal obligations. These rules are mandatory.
+TTSK is a public-procurement platform with legal obligations. These rules are mandatory.
 
 ## Hard rules
 
