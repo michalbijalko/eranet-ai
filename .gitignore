@@ -1,0 +1,3 @@
+# Nested application repositories (kept as separate git repos, not tracked here)
+publicERANET-client/
+publicERANET-server/
