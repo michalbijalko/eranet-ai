@@ -1,3 +1,6 @@
 # Nested application repositories (cloned separately, each has its own git)
 publicERANET-client/
 publicERANET-server/
+
+# Local environment config
+configS.bat
