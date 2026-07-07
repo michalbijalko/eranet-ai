@@ -39,7 +39,7 @@
                               │  JTA / JDBC
                               ▼
 ┌──────────────────────────────────────────────────────────────────────┐
-│   MySQL database  (JNDI: PublicSeasDS / PublicDS)                    │
+│   MySQL database  (JNDI: EranetVseTestDS / PublicDS)                    │
 │   Persistence unit: PublicTestPU                                     │
 │   `src/main/resources/META-INF/persistence.xml`                      │
 └──────────────────────────────────────────────────────────────────────┘
@@ -52,7 +52,7 @@
 | AngularJS SPA bootstrap | Module declaration, `$routeProvider` config, global `$rootScope` run block | `publicERANET-client/app/scripts/ng.app.js` |
 | SmartAdmin shell | jQuery-based layout, sidebar, widgets, date pickers | `publicERANET-client/app/scripts/app.js`, `app.config.js` |
 | Angular controllers | Screen-level logic, UI state, calling services | `publicERANET-client/app/scripts/controllers/**/*.js` (~34 top-level files + subdirs) |
-| Angular resource services | `$resource` wrappers mapping to server REST URLs | `publicERANET-client/app/scripts/service/resources/*.js` (129 files) |
+| Angular resource services | `$resource` wrappers mapping to server REST URLs | `publicERANET-client/app/scripts/service/resources/*.js` (141 files) |
 | Angular business services | Client-side business logic, caching, result manipulation | `publicERANET-client/app/scripts/service/business/*.js` |
 | Angular directives | Reusable table widgets, file upload tables, form helpers | `publicERANET-client/app/scripts/directives/*.js` |
 | Angular filters | Display formatting (status icons, numeric, date) | `publicERANET-client/app/scripts/filters.js` |
@@ -64,7 +64,7 @@
 | JPA entities / DTOs | `@Entity` classes mapped to MySQL tables; also serialized directly as JSON responses | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dto/*.java` (208 classes) |
 | `AuthenticationService` | Form-login, SAML/OIDC SSO, password reset, registration | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/AuthenticationService.java` |
 | `OIDCService` | OpenID Connect / JWT token handling using Nimbus JOSE | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/OIDCService.java` |
-| SAML/SSO | Slovak government UPVS SSO integration | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/` |
+| SAML/SSO | ÚPVS government SSO + VSE/eID (Azure AD) SSO | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/` (`UpvsSsoService.java`, `VseSsoService.java`) |
 | WebSocket endpoint | Real-time push notifications over WebSocket at `/websockets/realtime` | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/ws/RealTimeEndpoint.java` |
 | PDF generation services | Aspose-Word/PDF document generation | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/pdf/` |
 | Excel services | Apache POI + Aspose Cells export | `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/excel/` |
@@ -86,7 +86,7 @@
 **Client — Routing Layer:**
 - Purpose: Hash-based `ngRoute` routing; maps URL fragments to controller + template pairs
 - Location: `publicERANET-client/app/scripts/ng.app.js` (lines 28–656)
-- Contains: ~100 `$routeProvider.when(...)` declarations
+- Contains: ~190 `$routeProvider.when(...)` declarations
 - Depends on: Angular `ngRoute`, `ui.bootstrap`
 - Used by: Browser address bar; `$location.url()` calls in controllers
 
@@ -99,14 +99,14 @@
 
 **Client — Service / Resource Layer:**
 - Purpose: `$resource` factory wrappers (`*Resource` factories) + business-logic service objects that cache results and expose named methods
-- Location: `publicERANET-client/app/scripts/service/resources/` (129 files), `publicERANET-client/app/scripts/service/business/` (3 files)
+- Location: `publicERANET-client/app/scripts/service/resources/` (141 files), `publicERANET-client/app/scripts/service/business/` (3 files)
 - Pattern: Each resource file exports two factories — `XyzResource` (raw `$resource`) and `Xyz` (higher-level service wrapping it)
 - Depends on: `$resource`, `$http`, `$rootScope`, `ResultManipulator`, `Utils`, `FilterHelper`
 - Used by: Controllers
 
 **Client — Directive Layer:**
 - Purpose: Reusable UI widgets (data tables, file attachment grids, approval tables)
-- Location: `publicERANET-client/app/scripts/directives/` (35 files + `tableFilters/` subdir)
+- Location: `publicERANET-client/app/scripts/directives/` (51 files + `tableFilters/` subdir)
 - Depends on: Angular services, `ngTable`
 - Used by: View templates
 
@@ -142,11 +142,11 @@
 1. Browser calls `ng-app` bootstrap → `eranetPublic` module loaded from `publicERANET-client/app/scripts/ng.app.js`
 2. Route change → controller instantiated, calls `XyzResource.query(postData)` in `scripts/service/resources/xyz.js`
 3. Angular `$resource` issues `POST webresources/sc/xyz/query` (or `GET/PUT/DELETE` for others)
-4. HTTP request crosses to GlassFish WAR context `/public` (or `/public_seas` on WildFly)
+4. HTTP request crosses to GlassFish WAR context `/public` (or `/public_vse` on WildFly)
 5. `FindParametersSanitizer` interceptor (`interceptor/FindParametersSanitizer.java`) sanitizes query parameters
 6. `ApplicationConfig.addRestResources()` routes request to correct `XyzService.java` method
 7. `XyzService` (EJB `@Stateless`) validates auth via Java EE `@RolesAllowed`, delegates to `XyzDao.java`
-8. `XyzDao` uses `EntityManager` (EclipseLink, JTA data source `PublicSeasDS`) to query MySQL
+8. `XyzDao` uses `EntityManager` (EclipseLink, JTA data source `EranetVseTestDS`) to query MySQL
 9. Entity returned → Jackson serializes to JSON → response sent to client
 10. Angular `$resource` resolves promise → controller updates `$scope` → Angular digest cycle re-renders view
 
@@ -161,7 +161,7 @@
 
 1. Unauthenticated user sees `views/login.html` (controlled by `$root.logged` flag in `ng.app.js`)
 2. Credentials posted to `webresources/auth/login` (`AuthenticationService.java`)
-3. Server validates via Java EE FORM login realm `PublicSeasRM`; SAML SSO via `SAMLClient` (`saml/`); OIDC via `OIDCService.java` with Nimbus JOSE
+3. Server validates via Java EE FORM login realm `EranetVseTestRM`; SAML SSO via `SAMLClient` (`saml/`) — ÚPVS (`UpvsSsoService`) and VSE/eID Azure AD (`VseSsoService`, `@ApplicationPath("vse")`); OIDC via `OIDCService.java` with Nimbus JOSE
 4. On success, `$root.logged = true`; `$rootScope.currentUser` populated
 5. Logout: `webresources/auth/logout` → `window.location.href = result.content` redirect
 
@@ -206,9 +206,9 @@
 **Server WAR:**
 - Deployment descriptor: `publicERANET-server/src/main/webapp/WEB-INF/web.xml` (servlet 3.0, FORM auth, session timeout 30 min)
 - GlassFish deployment: `publicERANET-server/src/main/webapp/WEB-INF/glassfish-web.xml` (context root `/public`, alternatedocroot for client files)
-- WildFly/JBoss deployment: `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml` (context root `/public_seas`, security domain `PublicSeasRM`)
+- WildFly/JBoss deployment: `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml` (context root `/public_vse`, security domain `EranetVseTestRM`)
 - JAX-RS app class: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ApplicationConfig.java` (`@ApplicationPath("webresources")`)
-- JPA config: `publicERANET-server/src/main/resources/META-INF/persistence.xml` (persistence unit `PublicTestPU`, JTA data source `PublicSeasDS`, EclipseLink, 230+ entity registrations)
+- JPA config: `publicERANET-server/src/main/resources/META-INF/persistence.xml` (persistence unit `PublicTestPU`, JTA data source `EranetVseTestDS`, EclipseLink, 230+ entity registrations)
 - JDBC pool setup: `publicERANET-server/src/main/setup/glassfish-resources.xml` (MySQL, database `public`, JNDI `PublicDS`)
 - CDI beans: `publicERANET-server/src/main/webapp/WEB-INF/beans.xml`
 

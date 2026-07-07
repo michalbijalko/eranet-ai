@@ -36,6 +36,17 @@ This system is a **Slovak public-procurement management platform** (ERANET / VSE
 - SAML assertions: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/SamlAssertionContainer.java`
 - Keystore for signing: `publicERANET-server/src/main/resources/META-INF/alice2.jks` and `prod.jks`
 
+### 2b. SAML 2.0 SSO — VSE / eID (Azure AD)
+
+**Provider:** VSE identity provider over SAML (Azure AD) — a second, VSE-instance-specific SAML flow, separate from the ÚPVS government flow above and from OIDC.
+- SSO service: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/VseSsoService.java` (`@Path("/saml")`)
+- JAX-RS application: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/VseSsoApplication.java` (`@ApplicationPath("vse")`) — endpoints `/vse/saml/post/ac`, `/vse/saml/redirect/ac`, `/vse/saml/redirect/slo`, `/vse/saml/redirect/sloresponse`
+- IdP/SP metadata: `idp.vse.metadata.xml`, `sp.vse.metadata.xml` (dev variants: `dev.idp.metadata.xml`, `dev.sp.metadata.xml`)
+- Email claim: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`
+- Account linking: existing local users can associate their account with an eID GUID stored as a hash in `SystemUser.eidGuidHash`; unknown eID users are redirected to registration
+- Session / auth-history type: `SAML_VSE` (vs `SAML` for ÚPVS) — see `AuthenticationService.java` and `SystemUserAuthHistory.AUTH_TYPE_SAML_VSE`
+- Client entry point: `samlLoginAD()` in `publicERANET-client/app/scripts/controllers/login.js` → `POST webresources/auth/samlLoginAD`; button in `publicERANET-client/app/views/login.html`
+
 ### 3. OIDC / OAuth2 (OpenID Connect)
 
 **Provider:** Configurable OIDC provider (Microsoft Entra / Azure AD inferred from `TenantId` field)
@@ -54,7 +65,7 @@ This system is a **Slovak public-procurement management platform** (ERANET / VSE
 - **Type:** MySQL 5.7
 - **Container name:** `eranet_mysql`
 - **Database name:** `eranet_db`
-- **JTA data source JNDI:** `PublicSeasDS` (WildFly) / `PublicDS` (GlassFish legacy)
+- **JTA data source JNDI:** `EranetVseTestDS` (WildFly) / `PublicDS` (GlassFish legacy)
 - **Port (Docker):** `${MYSQL_PORT:-3307}:3306`
 - **Config:** `publicERANET-server/docker-compose.yml`
 - **Charset:** `utf8mb4`, collation `utf8mb4_slovak_ci`
@@ -113,6 +124,7 @@ Used extensively throughout the codebase for:
 - Company registration / password reset prompts
 - Internal request email confirmations
 - Undelivered email retry scheduler (`UndeliveredEmailNotificationSchedulerService.java`)
+- **VSE-specific:** contract completion in the Jackrabbit contract module notifies the VSE board at `predstavenstvo@vse.sk` (hardcoded in `publicERANET-client/app/modules/jackrabbit/controller/editContract.js`)
 
 ---
 
@@ -177,7 +189,7 @@ Used extensively throughout the codebase for:
 
 - Liquibase CLI (external tool, not Maven-managed)
 - Run via `configS.bat` at project root
-- Connects to `localhost:3306/seas_test` with the WildFly-bundled MySQL connector (`mysql-connector-java-8.0.22.jar`)
+- Connects to `localhost:3306/vse_test` with the WildFly-bundled MySQL connector (`mysql-connector-java-8.0.22.jar`)
 
 ### Containerisation
 

@@ -42,8 +42,8 @@ If the pair is missing from the table, add a row before committing.
 ## Where commits go — three separate repos
 
 The workspace is **three independent Git repos**, not one:
-- `publicERANET-server/` — server code (branch `seas-test`)
-- `publicERANET-client/` — client code (branch `seas-test`)
+- `publicERANET-server/` — server code (branch `vse_test`)
+- `publicERANET-client/` — client code (branch `vse_test`)
 - the workspace root (umbrella) — `CLAUDE.md`, `docs/`, `.claude/` (branch `master`)
 
 - Commit code in the repo it lives in. One ticket touching both sides → **one commit per

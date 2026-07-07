@@ -54,6 +54,26 @@ grep -rc "$OLD" CLAUDE.md .claude docs 2>/dev/null | grep -v ':0$'   # expect: n
 Scope `grep` to `CLAUDE.md .claude docs` so the gitignored nested repos are never scanned.
 A plain `$OLD → $NEW` swap covers `SEAS / ERANET`, `SEAS/ERANET`, and standalone `SEAS`.
 
+**Watch two traps the plain swap misses:**
+
+- **Case variants.** The label also appears lower/mixed-case (`seas_test`, `PublicSeasDS`), which
+  a case-sensitive swap skips. After the swap, run `grep -rni "$OLD" CLAUDE.md .claude docs` and
+  fix every residual by hand.
+- **Deployment-specific tokens are NOT a label swap.** Some values are instance config and take
+  *verified* per-instance values — read them from the nested checkout, never guess:
+
+  | Token (SEAS example) | Where the real value lives |
+  |---|---|
+  | datasource JNDI `PublicSeasDS` | `publicERANET-server/src/main/resources/META-INF/persistence.xml` |
+  | WildFly context root `/public_seas` | `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml` |
+  | security domain `PublicSeasRM` | `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml` |
+  | Maven artifact `eranet-server-seastest` | `publicERANET-server/pom.xml` (`artifactId`) |
+  | logging profile `seas_profile` | `publicERANET-server/pom.xml` (`manifestEntries`) |
+  | DB name / branch `seas_test` / `seas-test` | `configS.bat`, nested-repo branch |
+
+  For VSE these resolved to `EranetVseTestDS`, `/public_vse`, `EranetVseTestRM`,
+  `eranet-server-vsetest`, `vsds_profile`, and `vse_test`.
+
 **2. Reset the previous client's work log:**
 
 ```bash

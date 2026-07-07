@@ -67,7 +67,7 @@
 
 - **Severity:** HIGH
 - **Issue:** `configS.bat` (project root) contains a Liquibase migration command with the database root password in plaintext in the `--password` flag.
-- **File:** `C:\Innovis\seas_test\configS.bat`
+- **File:** `C:\Innovis\vse\configS.bat`
 - **Impact:** The database root password is stored in a committed script. It is also used with `&ssl=false`, disabling TLS for the MySQL connection.
 - **Fix approach:** Use a Liquibase `.properties` file (excluded from version control) or environment variable substitution. Enable SSL/TLS on the MySQL connection.
 
@@ -309,6 +309,7 @@
 - **Files:** Only `publicERANET-client/test/spec/controllers/main.js` exists (yeoman scaffold boilerplate).
 - **Risk:** UI regressions are undetectable programmatically.
 - **Priority:** MEDIUM
+- **VSE note:** the VSE-specific Jackrabbit contract module (`publicERANET-client/app/modules/jackrabbit/`) — contract lifecycle plus a board notification to `predstavenstvo@vse.sk` (hardcoded, requires a redeploy to change) — has no test coverage despite being mission-critical.
 
 ---
 

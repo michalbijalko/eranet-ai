@@ -6,7 +6,7 @@
 ## Directory Layout
 
 ```
-seas_test/                        # Workspace root
+vse/                              # Workspace root
 ├── configS.bat                   # Windows setup script
 ├── publicERANET-client/          # AngularJS 1.x SPA subproject (Git repo)
 │   ├── app/                      # Deployable SPA root
@@ -24,9 +24,10 @@ seas_test/                        # Workspace root
 │   │   │   ├── notification/     # SmartNotification plugin
 │   │   │   ├── plugin/           # Vendored JS plugins (datatables, select2, etc.)
 │   │   │   ├── service/          # Angular services
-│   │   │   │   ├── resources/    # $resource + business service pairs (129 files)
+│   │   │   │   ├── resources/    # $resource + business service pairs (141 files)
 │   │   │   │   └── business/     # Additional business-logic services (3 files)
 │   │   │   └── smartwidgets/     # JarvisWidget code
+│   │   ├── modules/              # VSE feature modules (jackrabbit/ — contract management)
 │   │   ├── views/                # HTML partial templates (mirror of controllers/)
 │   │   ├── styles/               # Minified CSS (SmartAdmin, Bootstrap, custom)
 │   │   ├── styles.no.min/        # Non-minified CSS source
@@ -67,7 +68,7 @@ seas_test/                        # Workspace root
     │   │   │   │   ├── logic/        # HTML table builder, file description collector
     │   │   │   │   ├── pdf/          # PDF generation services
     │   │   │   │   └── supplier/     # Supplier-specific services
-    │   │   │   ├── sso/              # UPVS government SSO
+    │   │   │   ├── sso/              # SSO: UPVS (government) + VSE/eID (Azure AD)
     │   │   │   └── ws/               # WebSocket endpoints
     │   │   ├── resources/
     │   │   │   └── META-INF/
@@ -95,7 +96,7 @@ seas_test/                        # Workspace root
         └── com/aspose/               # aspose-words, aspose-pdf, aspose-email, aspose-cells
 ```
 
-> **Git topology:** three independent repos — the two subprojects (each on branch `seas-test`) and the workspace-root/umbrella repo holding `docs/`, `.claude/`, `CLAUDE.md` (branch `master`). Code is committed in its subproject repo; docs and guidance in the umbrella. The `publicERANET-*` dirs are nested repos — never add them from the umbrella.
+> **Git topology:** three independent repos — the two subprojects (each on branch `vse_test`) and the workspace-root/umbrella repo holding `docs/`, `.claude/`, `CLAUDE.md` (branch `master`). Code is committed in its subproject repo; docs and guidance in the umbrella. The `publicERANET-*` dirs are nested repos — never add them from the umbrella.
 
 ## Directory Purposes
 
@@ -110,8 +111,13 @@ seas_test/                        # Workspace root
 
 **`publicERANET-client/app/scripts/service/resources/`:**
 - Purpose: One file per domain entity; each exports `XyzResource` ($resource) and `Xyz` (business wrapper)
-- Contains: 129 resource service files matching server entity names (e.g., `procurements.js`, `companies.js`, `agreements.js`, `applications.js`)
+- Contains: 141 resource service files matching server entity names (e.g., `procurements.js`, `companies.js`, `agreements.js`, `applications.js`)
 - REST URL pattern: `webresources/sc/<entity>/:id` with POST `query` action at `webresources/sc/<entity>/query`
+
+**`publicERANET-client/app/modules/jackrabbit/` (VSE instance):**
+- Purpose: Contract-management feature for the VSE instance — contract lifecycle, activities, checklists
+- Structure: `controller/` (e.g. `editContract.js`, `contractsOverview.js`), `service/contracts.js`, `view/`
+- VSE-specific: on contract completion, notifies the VSE board at `predstavenstvo@vse.sk` (hardcoded in `controller/editContract.js`)
 
 **`publicERANET-client/app/views/`:**
 - Purpose: HTML partial templates; directory structure mirrors `scripts/controllers/`
@@ -155,7 +161,7 @@ seas_test/                        # Workspace root
 - `publicERANET-server/src/main/setup/glassfish-resources.xml`: JDBC pool, MySQL connection properties
 - `publicERANET-server/src/main/webapp/WEB-INF/web.xml`: Servlet descriptor, security roles, session config
 - `publicERANET-server/src/main/webapp/WEB-INF/glassfish-web.xml`: GlassFish deployment — context root `/public`, client static file path
-- `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml`: WildFly deployment — context root `/public_seas`
+- `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml`: WildFly deployment — context root `/public_vse`
 - `publicERANET-client/app/scripts/config.js`: Angular `config` module with build timestamp constant
 - `publicERANET-client/Gruntfile.js`: Build pipeline (concat, uglify, copy, ngconstant for config.js)
 - `publicERANET-client/bower.json`: Front-end dependency manifest
@@ -170,7 +176,9 @@ seas_test/                        # Workspace root
 **SAML / SSO:**
 - `publicERANET-server/src/main/resources/META-INF/idp.metadata.xml`: SAML IdP metadata (active)
 - `publicERANET-server/src/main/resources/META-INF/sp.metadata.xml`: SAML SP metadata
-- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/UpvsSsoService.java`: UPVS government SSO
+- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/UpvsSsoService.java`: UPVS government SSO (`@ApplicationPath("upvs")`)
+- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/VseSsoService.java`: VSE / eID SSO (Azure AD SAML; `@ApplicationPath("vse")`)
+- `publicERANET-server/src/main/resources/META-INF/idp.vse.metadata.xml`, `sp.vse.metadata.xml`: VSE SAML metadata
 
 **Testing:**
 - `publicERANET-client/test/spec/`: Karma/Jasmine test specs (minimal)
