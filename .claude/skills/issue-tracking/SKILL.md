@@ -8,7 +8,7 @@ description: How we track work in Jira (EP project) - reading tickets before cod
 **Project key:** `EP` (e.g., `EP-12688`)
 
 Every code change traces to exactly one Jira ticket. This is not optional — it is the
-core discipline of VSE development.
+core discipline of SEPS development.
 
 ## Before writing any code
 
@@ -42,8 +42,8 @@ If the pair is missing from the table, add a row before committing.
 ## Where commits go — three separate repos
 
 The workspace is **three independent Git repos**, not one:
-- `publicERANET-server/` — server code (branch `vse_test`)
-- `publicERANET-client/` — client code (branch `vse_test`)
+- `publicERANET-server/` — server code (branch `sepsas_test`)
+- `publicERANET-client/` — client code (branch `sepsas_test`)
 - the workspace root (umbrella) — `CLAUDE.md`, `docs/`, `.claude/` (branch `master`)
 
 - Commit code in the repo it lives in. One ticket touching both sides → **one commit per

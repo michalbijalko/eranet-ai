@@ -1,9 +1,9 @@
 ---
 name: client-training
-description: How we produce client-facing training and onboarding material for VSE - step-by-step guides with screenshots that teach the client to use the procurement system. Use when preparing training/onboarding material, user guides, or when the user mentions "školenie", "tréningový materiál", "podklady pre klienta", "návod pre používateľa", "onboarding klienta". Generated from the built feature, in Slovak.
+description: How we produce client-facing training and onboarding material for SEPS - step-by-step guides with screenshots that teach the client to use the procurement system. Use when preparing training/onboarding material, user guides, or when the user mentions "školenie", "tréningový materiál", "podklady pre klienta", "návod pre používateľa", "onboarding klienta". Generated from the built feature, in Slovak.
 ---
 
-# Client training material (VSE)
+# Client training material (SEPS)
 
 Part of delivery: material that **trains the client to use the procurement system** — not
 internal technical docs (those are `documentation`). Audience is the end user (procuring

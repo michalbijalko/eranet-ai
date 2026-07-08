@@ -1,6 +1,6 @@
 # React / ShadCN reference
 
-This file is not applicable to VSE. VSE uses AngularJS 1.5 + Bootstrap 3.
+This file is not applicable to SEPS. SEPS uses AngularJS 1.5 + Bootstrap 3.
 
 See `angular-primeng.md` (renamed to reflect the actual stack) for the relevant
 component reference.

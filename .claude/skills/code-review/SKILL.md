@@ -1,12 +1,12 @@
 ---
 name: code-review
-description: VSE team checklist for reviewing code changes before they ship. Use when reviewing a diff, a PR, or just-written code, or when the user asks to "review", "skontroluj", "prejdi zmeny". Run on changed code, not the whole codebase.
+description: SEPS team checklist for reviewing code changes before they ship. Use when reviewing a diff, a PR, or just-written code, or when the user asks to "review", "skontroluj", "prejdi zmeny". Run on changed code, not the whole codebase.
 disable-model-invocation: false
 ---
 
 # Code review
 
-Review the change against VSE standards. Focus on team-specific concerns.
+Review the change against SEPS standards. Focus on team-specific concerns.
 
 ## Checklist
 

@@ -1,11 +1,11 @@
 ---
 name: security
-description: Security guidelines for VSE - role-based access, secrets handling, input sanitization, and the rule that sensitive config never lives in code. Use whenever adding endpoints, handling credentials, integrating external systems, or when the user mentions "security", "oprávnenia", "API kľúč", "roly".
+description: Security guidelines for SEPS - role-based access, secrets handling, input sanitization, and the rule that sensitive config never lives in code. Use whenever adding endpoints, handling credentials, integrating external systems, or when the user mentions "security", "oprávnenia", "API kľúč", "roly".
 ---
 
 # Security
 
-VSE is a public-procurement platform with legal obligations. These rules are mandatory.
+SEPS is a public-procurement platform with legal obligations. These rules are mandatory.
 
 ## Hard rules
 

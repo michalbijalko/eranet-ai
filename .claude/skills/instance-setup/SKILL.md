@@ -1,18 +1,18 @@
 ---
 name: instance-setup
-description: Rebrand and reset this wrapper repo for a new client instance of the ERANET platform. Use when starting work on a fresh instance branch, when the user says "rebrand", "set up this branch", "new client instance", "switch instance", or names a new instance label (e.g. "make this VSE"). Swaps the instance label, clears the previous instance's work log, and refreshes the client-variable codebase docs from the nested repos.
+description: Rebrand and reset this wrapper repo for a new client instance of the ERANET platform. Use when starting work on a fresh instance branch, when the user says "rebrand", "set up this branch", "new client instance", "switch instance", or names a new instance label (e.g. "make this SEPS"). Swaps the instance label, clears the previous instance's work log, and refreshes the client-variable codebase docs from the nested repos.
 ---
 
 # Instance setup (per-branch rebrand & reset)
 
-This repo (`C:\Innovis\vse`) is a **wrapper / meta repo**: it holds the AI setup
+This repo (`C:\Innovis\seps`) is a **wrapper / meta repo**: it holds the AI setup
 (`CLAUDE.md`, `.claude/skills`, `.claude/agents`, `.claude/hooks`, `docs/`) around two
 **gitignored** nested app repos — `publicERANET-client` and `publicERANET-server` — cloned
 from `bitbucket.org/eranetproject`.
 
 Each **branch** of this wrapper repo is one **client instance** of the same **ERANET**
-platform (e.g. `seas`, `vsds`/VSE). The nested code differs **per branch** (each client has
-its own nested-repo branch, e.g. VSE → `vse_test`), so client-specific features live in the
+platform (e.g. `seas`, `sepsas`/SEPS). The nested code differs **per branch** (each client has
+its own nested-repo branch, e.g. SEPS → `sepsas_test`), so client-specific features live in the
 current nested checkout.
 
 Use this skill to turn a freshly-branched wrapper into a clean setup for its client.
@@ -32,7 +32,7 @@ gitignored nested repos.
 
 ## Inputs
 
-- **New instance label** — the short display name (e.g. `VSE`). Ask the user if not given.
+- **New instance label** — the short display name (e.g. `SEPS`). Ask the user if not given.
 - **Old instance label** — detect it from `CLAUDE.md`'s header line
   `**<LABEL> / ERANET — Ticket-Driven Development**` (the word before ` / ERANET`).
 
@@ -44,7 +44,7 @@ Run from the repo root. Confirm the new label with the user before starting.
 
 ```bash
 OLD=SEAS   # detect from CLAUDE.md header
-NEW=VSE    # from the user
+NEW=SEPS    # from the user
 for f in $(grep -rl "$OLD" CLAUDE.md .claude docs 2>/dev/null); do
   sed -i "s/$OLD/$NEW/g" "$f"
 done
@@ -71,8 +71,8 @@ A plain `$OLD → $NEW` swap covers `SEAS / ERANET`, `SEAS/ERANET`, and standalo
   | logging profile `seas_profile` | `publicERANET-server/pom.xml` (`manifestEntries`) |
   | DB name / branch `seas_test` / `seas-test` | `configS.bat`, nested-repo branch |
 
-  For VSE these resolved to `EranetVseTestDS`, `/public_vse`, `EranetVseTestRM`,
-  `eranet-server-vsetest`, `vsds_profile`, and `vse_test`.
+  For SEPS these resolved to `PublicSepsDS`, `/public_seps`, `PublicSepsRM`,
+  `eranet-server-sepstest`, `seps_profile`, and `sepsas_test`.
 
 **2. Reset the previous client's work log:**
 

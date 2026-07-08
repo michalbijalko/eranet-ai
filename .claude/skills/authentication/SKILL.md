@@ -1,11 +1,11 @@
 ---
 name: authentication
-description: How authentication works in VSE - local username/password, SAML 2.0 SSO via slovensko.sk (ÚPVS), and OIDC/OAuth2. Use whenever touching login flows, session handling, protected endpoints, or SSO. Do not reinvent — work with the existing AuthenticationService and OIDCService.
+description: How authentication works in SEPS - local username/password, SAML 2.0 SSO via slovensko.sk (ÚPVS), and OIDC/OAuth2. Use whenever touching login flows, session handling, protected endpoints, or SSO. Do not reinvent — work with the existing AuthenticationService and OIDCService.
 ---
 
 # Authentication
 
-VSE supports three authentication mechanisms, all implemented in the existing codebase.
+SEPS supports three authentication mechanisms, all implemented in the existing codebase.
 Do not build a new auth system — extend or fix the existing one.
 
 ## Mechanisms
@@ -21,7 +21,7 @@ Do not build a new auth system — extend or fix the existing one.
 
 - Identity provider: `https://prihlasenie.slovensko.sk/oam/fed` (ÚPVS — Ústredný portál verejnej správy).
 - Library: `java-saml 2.2.0` (OneLogin) + `opensaml 2.6.4`.
-- SP and IdP metadata: `publicERANET-server/src/main/resources/META-INF/` (`sp.metadata.xml`, `idp.metadata.xml`, VSE variants).
+- SP and IdP metadata: `publicERANET-server/src/main/resources/META-INF/` (`sp.metadata.xml`, `idp.metadata.xml`, SEPS variants).
 - SAML signing keystore: `alice2.jks` (test) / `prod.jks` (production) — both committed to the repo.
 - Code: `publicERANET-server/.../saml/` (`SAMLClient`, `SAMLInit`, `SAMLUtils`) and `.../sso/UpvsSsoService.java`.
 - Changes here require careful testing — the ÚPVS integration is government-regulated.

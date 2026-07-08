@@ -1,9 +1,9 @@
 ---
 name: demo-material
-description: Prepare material to present/demo a built VSE feature to stakeholders or the client - a demo scenario/script, what to show in what order, talking points, and demo data or screenshots. Use when preparing a demo or presentation, or when the user mentions "demo", "demoscenár", "prezentácia", "odprezentovať", "ukázať klientovi", "demo scenario". Distinct from client-training (which teaches the user to operate the app); this is for showing and selling the result.
+description: Prepare material to present/demo a built SEPS feature to stakeholders or the client - a demo scenario/script, what to show in what order, talking points, and demo data or screenshots. Use when preparing a demo or presentation, or when the user mentions "demo", "demoscenár", "prezentácia", "odprezentovať", "ukázať klientovi", "demo scenario". Distinct from client-training (which teaches the user to operate the app); this is for showing and selling the result.
 ---
 
-# Demo material (VSE)
+# Demo material (SEPS)
 
 Part of delivery: material for *presenting* what was built — to stakeholders or the client.
 Not a user manual (that's `client-training`); this is the narrative for a live showing.
@@ -34,7 +34,7 @@ Not a user manual (that's `client-training`); this is the narrative for a live s
 
 ## Domain context
 
-VSE screens deal with: procurement tenders, qualification systems, electronic auctions,
+SEPS screens deal with: procurement tenders, qualification systems, electronic auctions,
 company profiles, document signing, and reporting to UVO/EKS/URSO. Use terminology the
 client recognizes — "obstarávateľ", "dodávateľ", "zákazka", "ponuka", etc. — not
 internal field names.

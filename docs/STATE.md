@@ -1,4 +1,4 @@
-# Project State: VSE / ERANET — Ticket-Driven Development
+# Project State: SEPS / ERANET — Ticket-Driven Development
 
 *Last updated: 2026-06-03*
 
