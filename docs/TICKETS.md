@@ -23,6 +23,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 
 | Feature | Story | Dev |
 |---|---|---|
+| eZmluvy export – company filter | EP-13235 | EP-13236 |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
