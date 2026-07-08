@@ -20,7 +20,7 @@
 - **Issue:** Bower was officially deprecated in 2017. It is no longer maintained, its registry may go offline, and new packages are not published to it. The project uses `publicERANET-client/bower.json` exclusively for frontend dependency management.
 - **Files:** `publicERANET-client/bower.json`, `publicERANET-client/Gruntfile.js` (task: `bowerInstall`)
 - **Impact:** Dependency resolution at install time may fail or produce inconsistent results. Security auditing (e.g., `npm audit` equivalent) is not available for Bower packages.
-- **Additional concern:** `publicERANET-client/app/bower_components/` is present in the repository despite being listed in `.gitignore` (line 5 of `publicERANET-client/.gitignore`). This means ~55 vendored frontend libraries — including CKEditor 4.6.2 (superseded by 4 LTS), jQuery, Bootstrap 3, etc. — are committed to version control, inflating repo size and making upgrades invisible.
+- **Additional concern:** `publicERANET-client/app/bower_components/` is gitignored (line 5 of `publicERANET-client/.gitignore`) and is **not present in a fresh checkout** — the ~55 vendored frontend libraries (CKEditor 4.6.2, superseded by 4 LTS; jQuery; Bootstrap 3; etc.) are installed via Bower at build time rather than committed. Upgrades remain invisible in the dependency manifest, though the assets themselves do not inflate the repository.
 - **Fix approach:** Migrate to npm/yarn; remove `bower_components` from repo and restore via `.gitignore`; consolidate vendored assets.
 
 ### Grunt 0.4.x (Legacy)
@@ -47,7 +47,7 @@
 
 - **Severity:** HIGH (CRITICAL)
 - **Issue:** The SAML signing credential initialisation hardcodes both the keystore password and the private key alias password directly in Java source code.
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/saml/SAMLClient.java` lines 945–946
+- **Files:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/saml/SAMLClient.java` lines 931–932
   ```java
   char[] keystorePass = "jNTYEYEVYUJM0eanM2xV".toCharArray();
   char[] aliasPass    = "yz?dw\"XU%.bG8%;%:LGB".toCharArray();
@@ -67,7 +67,7 @@
 
 - **Severity:** HIGH
 - **Issue:** `configS.bat` (project root) contains a Liquibase migration command with the database root password in plaintext in the `--password` flag.
-- **File:** `C:\Innovis\vse\configS.bat`
+- **File:** `C:\Innovis\seps\configS.bat`
 - **Impact:** The database root password is stored in a committed script. It is also used with `&ssl=false`, disabling TLS for the MySQL connection.
 - **Fix approach:** Use a Liquibase `.properties` file (excluded from version control) or environment variable substitution. Enable SSL/TLS on the MySQL connection.
 
@@ -96,14 +96,14 @@
 
 - **Severity:** HIGH
 - **Issue:** `web.xml` explicitly sets `<transport-guarantee>NONE</transport-guarantee>` for the security constraint protecting `/webresources/sc/*`. This means the container will not redirect HTTP to HTTPS, and sensitive data (including session cookies) can be transmitted in cleartext if the front-end proxy is misconfigured.
-- **File:** `publicERANET-server/src/main/webapp/WEB-INF/web.xml` line 25
+- **File:** `publicERANET-server/public-eranet/src/main/webapp/WEB-INF/web.xml` line 25
 - **Fix approach:** Change to `<transport-guarantee>CONFIDENTIAL</transport-guarantee>` and ensure TLS termination is handled at the application server or reverse proxy layer.
 
 ### Session Cookie Not Marked Secure or HttpOnly
 
 - **Severity:** MEDIUM
 - **Issue:** `web.xml` renames the session cookie to `SESSIONID` but does not set `<secure>true</secure>` or `<http-only>true</http-only>` on the cookie configuration.
-- **File:** `publicERANET-server/src/main/webapp/WEB-INF/web.xml` lines 6–8
+- **File:** `publicERANET-server/public-eranet/src/main/webapp/WEB-INF/web.xml` lines 6–8
 - **Fix approach:** Add `<secure>true</secure>` and `<http-only>true</http-only>` inside `<cookie-config>`.
 
 ### SAML Library (OpenSAML 2.6.4) End of Life
@@ -189,11 +189,11 @@
 - **Severity:** HIGH
 - **Issue:** Several service classes are extremely large, combining REST endpoint definition, business logic, validation, and data access in a single file. This makes them hard to test, maintain, or modify safely.
 - **Files and sizes:**
-  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ProcurementService.java` — 9,596 lines
-  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UvoService.java` — 6,431 lines
-  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/CompanyInProcurementService.java` — 5,369 lines
-  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/pdf/ProcurementAllPdfGeneratingService.java` — 4,879 lines
-  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ParticipantConditionInProcurementService.java` — 4,706 lines
+  - `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/ProcurementService.java` — 7,832 lines
+  - `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/UvoService.java` — 6,407 lines
+  - `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/CompanyInProcurementService.java` — 5,305 lines
+  - `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/pdf/ProcurementAllPdfGeneratingService.java` — 5,230 lines
+  - `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/ParticipantConditionInProcurementService.java` — 4,475 lines
 - **Impact:** High cyclomatic complexity, zero automated tests, fragile to any change.
 - **Fix approach:** Extract business logic into dedicated domain service classes; separate REST layer from business logic layer; introduce unit tests incrementally.
 
@@ -211,8 +211,8 @@
 
 - **Severity:** MEDIUM
 - **Issue:** `StatisticsService.java` builds SQL queries by string concatenation using a `StringBuilder`, including dynamically inserting integer ID lists (sourced from other queries). While the IDs appear to be typed integers from JPA results (reducing injection risk), the approach bypasses `PreparedStatement` parameterization entirely for these queries.
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/StatisticsService.java` lines 1352–1372
-- **Secondary:** 124 `setSqlQuery()` calls across `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/statistics/` classes each contain a hardcoded native SQL template with `IN (#)` that gets string-replaced at runtime.
+- **Files:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/StatisticsService.java` (StringBuilder-built SQL in the statistics query construction)
+- **Secondary:** 124 `setSqlQuery()` calls across `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/statistics/` classes each contain a hardcoded native SQL template with `IN (#)` that gets string-replaced at runtime.
 - **Fix approach:** Validate that all `#` substitution values are provably integer-typed before execution; alternatively convert to `PreparedStatement` with `setInt()`.
 
 ### Aspose Libraries as In-Project JARs
@@ -227,21 +227,21 @@
 
 - **Severity:** LOW
 - **Issue:** `LoggingHandler.java` logs all inbound and outbound SOAP messages to `System.out` using `System.out.println`. This is a debug artifact left in production code. SOAP messages may contain sensitive data.
-- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/LoggingHandler.java` lines 25, 38
+- **File:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/LoggingHandler.java` lines 25, 38
 - **Fix approach:** Replace `System.out.println` with `logger.debug()`; gate behind a feature flag or remove entirely.
 
 ### `e.printStackTrace()` in Production Code
 
 - **Severity:** LOW
 - **Issue:** Five occurrences of `e.printStackTrace()` in production Java code, most critically in `SAMLClient.java`'s `intializeCredentials()` method — meaning a keystore load failure (null `signingCredential`) will silently cause NPEs in SAML operations.
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/saml/SAMLClient.java` line 967, `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/ws/PingEndpoint.java`, `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UndeliveredEmailNotificationSchedulerService.java`
+- **Files:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/saml/SAMLClient.java`, `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/ws/PingEndpoint.java`, `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/UndeliveredEmailNotificationSchedulerService.java`
 - **Fix approach:** Replace with proper logger error calls and rethrow or fail-fast.
 
 ### Empty Catch Blocks
 
 - **Severity:** MEDIUM
 - **Issue:** 10 empty catch blocks found across `ProcurementDao.java` (8 occurrences) and `ProcurementDataRetentionService.java` (2 occurrences). Exceptions are silently swallowed.
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/ProcurementDao.java`, `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ProcurementDataRetentionService.java`
+- **Files:** `publicERANET-server/eranet-dao/src/main/java/sk/innovis/eranetpublic/server/dao/ProcurementDao.java`, `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/ProcurementDataRetentionService.java`
 - **Fix approach:** At minimum log the exception; preferably rethrow as a typed application exception.
 
 ---
@@ -252,7 +252,7 @@
 
 - **Severity:** MEDIUM
 - **Issue:** Three TODO comments in `UvoService.java` reference an unimplemented feature: sending an identifier for a dropdown field controlling qualification conditions.
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UvoService.java` lines 3078, 3318, 3325
+- **Files:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/UvoService.java` lines 3078, 3318, 3325
   ```java
   // TODO: po novom musím poslať identifikator rozbaľovacieho poľa...
   ```
@@ -261,13 +261,13 @@
 
 - **Severity:** LOW
 - **Issue:** TODOs reference Jira tickets that are deferred but not resolved.
-- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/InternalRequestService.java` lines 1252, 1256 (`EP-3908`), 1477 (`EP-3569`)
+- **File:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/InternalRequestService.java` lines 1252, 1256 (`EP-3908`), 1477 (`EP-3569`)
 
 ### Notification Bug Suppressed (ScheduleService)
 
 - **Severity:** MEDIUM
 - **Issue:** Notification sending for qualification system levels with stages is intentionally disabled with a TODO referencing a Jira ticket.
-- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ScheduleService.java` line 1007
+- **File:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/ScheduleService.java` line 1007
   ```java
   //TODO: fix v https://innovis.atlassian.net/browse/EP-8225, teraz len docasne neposiela notifikacie na KS so stupnami
   ```
@@ -275,7 +275,7 @@
 ### LoggingHandler Unhandled Exception
 
 - **Severity:** LOW
-- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/LoggingHandler.java` lines 36, 48
+- **File:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/LoggingHandler.java` lines 36, 48
   ```java
   // TODO: What do I have to do in this case?
   ```
@@ -309,7 +309,7 @@
 - **Files:** Only `publicERANET-client/test/spec/controllers/main.js` exists (yeoman scaffold boilerplate).
 - **Risk:** UI regressions are undetectable programmatically.
 - **Priority:** MEDIUM
-- **VSE note:** the VSE-specific Jackrabbit contract module (`publicERANET-client/app/modules/jackrabbit/`) — contract lifecycle plus a board notification to `predstavenstvo@vse.sk` (hardcoded, requires a redeploy to change) — has no test coverage despite being mission-critical.
+- **SEPS note:** the SEPS-specific eContracts module (`publicERANET-client/app/scripts/controllers/econtracts/`) — contract lifecycle plus a board notification with a hardcoded recipient — has no test coverage despite being mission-critical. The client alert text (`predstavenstvo@vse.sk`) lives in `editEcontract.js` (lines 606 and 1036); the server-side send is in `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/EcontractService.java` (~line 2458), where the live recipient is actually `notifikacie1@gmail.com` and `predstavenstvo@vse.sk` survives only in a trailing comment — changing it requires a redeploy.
 
 ---
 
@@ -317,19 +317,19 @@
 
 ### SAML Authentication (`SAMLClient.java`)
 
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/saml/SAMLClient.java` (970 lines)
+- **Files:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/saml/SAMLClient.java` (956 lines)
 - **Why fragile:** Uses EOL `opensaml 2.6.4`, hardcoded keystore passwords, `e.printStackTrace()` on credential failure (which leaves `signingCredential` null and causes NPE on first SAML operation), and repeated `intializeCredentials()` calls (lines 162, 442, 517, 580) rather than singleton initialization.
 - **Safe modification:** Any change must be tested against a live or mocked SAML IdP. Verify SAML SSO and SLO flows end-to-end after any modification.
 
 ### Statistics SQL Engine (`StatisticsService.java`, `StatisticsField.java`)
 
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/StatisticsService.java`, `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/statistics/` (124 native SQL query classes)
+- **Files:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/StatisticsService.java`, `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/statistics/` (124 native SQL query classes)
 - **Why fragile:** Hand-built SQL query construction using `StringBuilder` with filter chaining and string-replaced `IN (#)` ID lists. Any change to filter logic risks breaking query structure. No tests exist.
 - **Safe modification:** Only modify one filter path at a time; test with the full statistics export UI after every change.
 
 ### File Binary Storage in MySQL (`FileDao.java`)
 
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/FileDao.java`
+- **Files:** `publicERANET-server/eranet-dao/src/main/java/sk/innovis/eranetpublic/server/dao/FileDao.java`
 - **Why fragile:** Binary file data is stored as BLOBs directly in MySQL (`SELECT data FROM file WHERE id = ?`). Large file uploads will cause memory pressure. The DAO uses `PreparedStatement` with `?` placeholders correctly (no injection risk), but the pattern does not scale.
 - **Test coverage:** None.
 
@@ -341,7 +341,7 @@
 
 - **Severity:** MEDIUM
 - **Problem:** All file attachments are stored as MySQL BLOBs in the `file` table. At scale this severely impacts database size, backup time, and memory consumption when streaming large files.
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/FileDao.java`
+- **Files:** `publicERANET-server/eranet-dao/src/main/java/sk/innovis/eranetpublic/server/dao/FileDao.java`
 - **Improvement path:** Migrate to filesystem or object storage (S3-compatible); store only file metadata in the DB.
 
 ### No Frontend Build Minification in Development
@@ -355,7 +355,7 @@
 
 ### No HTTPS Enforcement
 
-- **Problem:** `transport-guarantee` is `NONE` in `publicERANET-server/src/main/webapp/WEB-INF/web.xml`. The application relies entirely on external infrastructure (reverse proxy) to enforce HTTPS. If deployed without a TLS proxy, all traffic — including credentials and session cookies — is unencrypted.
+- **Problem:** `transport-guarantee` is `NONE` in `publicERANET-server/public-eranet/src/main/webapp/WEB-INF/web.xml`. The application relies entirely on external infrastructure (reverse proxy) to enforce HTTPS. If deployed without a TLS proxy, all traffic — including credentials and session cookies — is unencrypted.
 
 ### No CORS Configuration
 

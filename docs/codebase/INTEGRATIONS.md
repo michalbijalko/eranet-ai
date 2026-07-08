@@ -6,7 +6,7 @@
 
 ## Domain Context
 
-This system is a **Slovak public-procurement management platform** (ERANET / VSE — "Systém riadenia obstarávaní"). The domain involves:
+This system is a **Slovak public-procurement management platform** (ERANET / SEPS — "Systém riadenia obstarávaní"). The domain involves:
 - Procurement tenders and qualification systems (supplier management)
 - Electronic auctions with real-time bidding
 - Document generation and archiving
@@ -27,34 +27,30 @@ This system is a **Slovak public-procurement management platform** (ERANET / VSE
 
 **Provider:** Slovak eGovernment portal — ÚPVS (Ústredný portál verejnej správy)
 - IdP endpoint: `https://prihlasenie.slovensko.sk/oam/fed`
-- IdP metadata: `publicERANET-server/src/main/resources/META-INF/idp.metadata.xml`
-- IdP metadata for VSE (partner institution): `publicERANET-server/src/main/resources/META-INF/idp.vse.metadata.xml`
-- SP metadata: `publicERANET-server/src/main/resources/META-INF/sp.metadata.xml`, `sp.vse.metadata.xml`
+- IdP metadata loaded by code: `publicERANET-server/public-eranet/src/main/resources/META-INF/idp.metadata.xml`
+- SP metadata loaded by code: `publicERANET-server/public-eranet/src/main/resources/META-INF/sp.metadata.xml`
 - Library: `java-saml 2.2.0` (OneLogin) + `opensaml 2.6.4`
-- SAML logic: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/saml/` (`SAMLClient.java`, `SAMLInit.java`, `SAMLUtils.java`, `IdPConfig.java`, `SPConfig.java`, `AttributeSet.java`)
-- SSO service (UPVS-specific flow): `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/UpvsSsoService.java`
-- SAML assertions: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/SamlAssertionContainer.java`
-- Keystore for signing: `publicERANET-server/src/main/resources/META-INF/alice2.jks` and `prod.jks`
+- SAML logic: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/saml/` (`SAMLClient.java`, `SAMLInit.java`, `SAMLUtils.java`, `IdPConfig.java`, `SPConfig.java`, `AttributeSet.java`)
+- SSO service (ÚPVS-specific flow): `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/sso/UpvsSsoService.java` (`@Path("/saml")`)
+- JAX-RS application: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/sso/UpvsSsoApplication.java` (`@ApplicationPath("upvs")`) — endpoints served under `/upvs/saml/...`
+- SAML assertions: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/sso/SamlAssertionContainer.java`
+- Keystore for signing: `publicERANET-server/public-eranet/src/main/resources/META-INF/alice2.jks` and `prod.jks`
 
-### 2b. SAML 2.0 SSO — VSE / eID (Azure AD)
+### 2b. SAML 2.0 SSO — AD / eID (Azure AD SAML)
 
-**Provider:** VSE identity provider over SAML (Azure AD) — a second, VSE-instance-specific SAML flow, separate from the ÚPVS government flow above and from OIDC.
-- SSO service: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/VseSsoService.java` (`@Path("/saml")`)
-- JAX-RS application: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/VseSsoApplication.java` (`@ApplicationPath("vse")`) — endpoints `/vse/saml/post/ac`, `/vse/saml/redirect/ac`, `/vse/saml/redirect/slo`, `/vse/saml/redirect/sloresponse`
-- IdP/SP metadata: `idp.vse.metadata.xml`, `sp.vse.metadata.xml` (dev variants: `dev.idp.metadata.xml`, `dev.sp.metadata.xml`)
+**Provider:** Azure AD identity provider over SAML — a second, instance-specific SAML flow, separate from the ÚPVS government flow above.
+- SSO service: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/sso/SsoService.java` (`@Path("/saml")`)
+- JAX-RS application: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/sso/SsoApplication.java` (`@ApplicationPath("ad")`) — endpoints `/ad/saml/post/ac`, `/ad/saml/redirect/ac`, `/ad/saml/redirect/slo`, `/ad/saml/redirect/sloresponse`
+- IdP/SP metadata loaded by code: `publicERANET-server/public-eranet/src/main/resources/META-INF/idp.ad.metadata.xml`, `sp.ad.metadata.xml` (dev variants: `dev.idp.metadata.xml`, `dev.sp.metadata.xml`)
 - Email claim: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`
 - Account linking: existing local users can associate their account with an eID GUID stored as a hash in `SystemUser.eidGuidHash`; unknown eID users are redirected to registration
-- Session / auth-history type: `SAML_VSE` (vs `SAML` for ÚPVS) — see `AuthenticationService.java` and `SystemUserAuthHistory.AUTH_TYPE_SAML_VSE`
 - Client entry point: `samlLoginAD()` in `publicERANET-client/app/scripts/controllers/login.js` → `POST webresources/auth/samlLoginAD`; button in `publicERANET-client/app/views/login.html`
+
+> **Note:** the `idp.vse.metadata.xml` / `sp.vse.metadata.xml` files still exist on disk but are not referenced by any code — they are not part of an active flow.
 
 ### 3. OIDC / OAuth2 (OpenID Connect)
 
-**Provider:** Configurable OIDC provider (Microsoft Entra / Azure AD inferred from `TenantId` field)
-- Config class: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/configuration/OIDCConfiguration.java`
-  - Fields: `BaseURL`, `TenantId`, `ClientId`, `ClientSecret`, `StateSecret`, `Scope`, `RedirectURIPostfix`
-- REST service: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/OIDCService.java`
-- JWT handling: `nimbus-jose-jwt 9.37.3` + `java-jwt 3.3.0`
-- Client-side: `angularjs-oauth2 ~1.2.3` (`publicERANET-client/bower.json`)
+**Not active on this instance.** There is no server-side OIDC integration — no `OIDCService`, no `OIDCConfiguration`, and no Nimbus/OpenID dependencies in the server code or POMs. The client `bower.json` still lists `angularjs-oauth2 ~1.2.3`, but the corresponding server OIDC endpoint is absent, so the flow is not wired up.
 
 ---
 
@@ -65,7 +61,7 @@ This system is a **Slovak public-procurement management platform** (ERANET / VSE
 - **Type:** MySQL 5.7
 - **Container name:** `eranet_mysql`
 - **Database name:** `eranet_db`
-- **JTA data source JNDI:** `EranetVseTestDS` (WildFly) / `PublicDS` (GlassFish legacy)
+- **JTA data source JNDI:** `PublicSepsDS` (WildFly) / `PublicDS` (GlassFish legacy)
 - **Port (Docker):** `${MYSQL_PORT:-3307}:3306`
 - **Config:** `publicERANET-server/docker-compose.yml`
 - **Charset:** `utf8mb4`, collation `utf8mb4_slovak_ci`
@@ -94,7 +90,7 @@ Commercial Aspose libraries are used to generate and process Office/PDF document
 - `aspose-pdf 10.6.2` — PDF generation
 - `aspose-email 5.9.0` — Email/MSG file processing
 - `aspose-cells 8.5.2` — Excel file generation
-- License: `publicERANET-server/src/main/resources/META-INF/Aspose.Total.Java.lic` (loaded at startup in `AuthenticationService.java`)
+- License: `publicERANET-server/public-eranet/src/main/resources/META-INF/Aspose.Total.Java.lic` (loaded at startup in `AuthenticationService.java`)
 - JARs served from local Maven repo: `publicERANET-server/lib/`
 
 ### Apache POI
@@ -107,7 +103,7 @@ Commercial Aspose libraries are used to generate and process Office/PDF document
 ## Email (SMTP)
 
 **Library:** Apache Commons Email `1.3.3`
-**Config class:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/configuration/MailServerConfiguration.java`
+**Config class:** `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/configuration/MailServerConfiguration.java`
 
 Config fields stored in the application's `Setting` table (DB-driven configuration):
 - `HostName` — SMTP server hostname
@@ -124,7 +120,7 @@ Used extensively throughout the codebase for:
 - Company registration / password reset prompts
 - Internal request email confirmations
 - Undelivered email retry scheduler (`UndeliveredEmailNotificationSchedulerService.java`)
-- **VSE-specific:** contract completion in the Jackrabbit contract module notifies the VSE board at `predstavenstvo@vse.sk` (hardcoded in `publicERANET-client/app/modules/jackrabbit/controller/editContract.js`)
+- **Contract completion notification:** the server-side email send is in `EcontractService.java` (`publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/EcontractService.java`, ~line 2458): `message.setEmailRecipients("notifikacie1@gmail.com");//predstavenstvo@vse.sk` — the live recipient is `notifikacie1@gmail.com`, with `predstavenstvo@vse.sk` present only in a trailing comment. The client alert text mentioning `predstavenstvo@vse.sk` lives in `publicERANET-client/app/scripts/controllers/econtracts/editEcontract.js` (lines 606, 1036).
 
 ---
 
@@ -133,30 +129,30 @@ Used extensively throughout the codebase for:
 ### UVO — Úrad pre verejné obstarávanie (Slovak Public Procurement Office)
 
 **Purpose:** Publish procurement notices to the official Slovak procurement bulletin
-- Service: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UvoService.java`
-- Scheduler: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UvoScheduleService.java`
+- Service: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/UvoService.java`
+- Scheduler: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/UvoScheduleService.java`
 - HTTP client: Unirest (`com.mashape.unirest 1.4.7`)
 
 ### EKS — Elektronické kontraktačné systém (Electronic Contracting System)
 
 **Purpose:** Integration with the Slovak national electronic contracting platform
-- Service: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/EksService.java`
-- Request/response DTOs: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/helpDto/EksRequest.java`, `EksZipFileResponse.java`
+- Service: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/EksService.java`
+- Request/response DTOs: `publicERANET-server/eranet-dao/src/main/java/sk/innovis/eranetpublic/server/dao/helpDto/EksRequest.java`, `EksZipFileResponse.java`
 - HTTP client: Unirest
 
 ### URSO — Úrad pre reguláciu sieťových odvetví (Regulatory Office for Network Industries)
 
 **Purpose:** Publish/reporting to the Slovak network industries regulator
-- Service: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UrsoPublishingService.java`
+- Service: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/UrsoPublishingService.java`
 
 ---
 
 ## Real-Time / WebSocket
 
 **Protocol:** JSR-356 Java WebSocket
-- Endpoint: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/ws/PingEndpoint.java`
+- Endpoints (`publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/ws/`): `PingEndpoint.java`, `RealTimeEndpoint.java`, `EvoEndpoint.java`, `WsEndpoint.java`
 - URL path: `wss://<host>/websockets/ping/{groupId}` where `groupId` = procurement ID
-- Configurator: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/ws/CustomConfigurator.java`
+- Configurator: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/ws/CustomConfigurator.java`
 - Client library: `angular-websocket ~2.0.0` (`publicERANET-client/bower.json`)
 - **Use cases:**
   - Live online-presence tracking of companies during procurement opening sessions
@@ -168,11 +164,11 @@ Used extensively throughout the codebase for:
 ## External SOAP Web Service — ProEBiz Auction Engine
 
 **Purpose:** SOAP integration with ProEBiz — a third-party electronic auction platform
-- WSDL: `publicERANET-server/src/main/resources/META-INF/proebiz_schema.wsdl`
-- Generated JAX-WS client: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/WebserviceService.java`
-- Type classes: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/types/` (ArrayOfAuctionName, ArrayOfRounds, ArrayOfItems, etc.)
+- WSDL: `publicERANET-server/public-eranet/src/main/resources/META-INF/proebiz_schema.wsdl`
+- Generated JAX-WS client: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/WebserviceService.java`
+- Type classes: `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/types/` (ArrayOfAuctionName, ArrayOfRounds, ArrayOfItems, etc.)
 - WSDL location in code is commented out (`//file:/C:/Program%20Files/Java/jdk1.8.0_221/bin/proebiz.wsdl`) — integration is partially disabled/stub
-- `LoggingHandler.java` present for SOAP message logging
+- `LoggingHandler.java` present for SOAP message logging (`publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/LoggingHandler.java`)
 
 ---
 
@@ -189,7 +185,7 @@ Used extensively throughout the codebase for:
 
 - Liquibase CLI (external tool, not Maven-managed)
 - Run via `configS.bat` at project root
-- Connects to `localhost:3306/vse_test` with the WildFly-bundled MySQL connector (`mysql-connector-java-8.0.22.jar`)
+- Connects to `localhost:3306/eranet` (per `configS.bat`) with the WildFly-bundled MySQL connector (`mysql-connector-java-8.0.22.jar`)
 
 ### Containerisation
 
@@ -207,13 +203,12 @@ Used extensively throughout the codebase for:
 
 **Additional config stored in DB (`Setting` entity):**
 - SMTP settings (host, port, credentials)
-- OIDC settings (ClientId, ClientSecret, TenantId, BaseURL)
 - UVO / EKS API endpoints and credentials
 
 **Secrets location:**
-- OIDC client secrets and SMTP passwords stored in the MySQL `Setting` table (runtime)
-- SAML keystores: `publicERANET-server/src/main/resources/META-INF/alice2.jks` (test) and `prod.jks` (production) — committed to repo
-- Aspose license: `publicERANET-server/src/main/resources/META-INF/Aspose.Total.Java.lic` — committed to repo
+- SMTP passwords stored in the MySQL `Setting` table (runtime)
+- SAML keystores: `publicERANET-server/public-eranet/src/main/resources/META-INF/alice2.jks` (test) and `prod.jks` (production) — committed to repo
+- Aspose license: `publicERANET-server/public-eranet/src/main/resources/META-INF/Aspose.Total.Java.lic` — committed to repo
 
 ---
 
