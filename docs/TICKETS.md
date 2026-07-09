@@ -23,6 +23,10 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 
 | Feature | Story | Dev |
 |---|---|---|
+| Evaluation: "Schvaľovateľ" (Approver) column in overview + filter + export | EP-13134 | EP-13155 |
+| Evaluation: delegation functionality for approver | EP-13135 | EP-13157 |
+| Požiadavky IO/VO: rename attribute to "Obsahuje limitované informácie" | EP-13136 | EP-13159 |
+| Požiadavky IO/VO: new attribute "Stupeň dôvernosti" | EP-13137 | EP-13161 |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
