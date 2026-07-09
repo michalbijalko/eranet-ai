@@ -30,6 +30,12 @@ Use this skill to turn a freshly-branched wrapper into a clean setup for its cli
 the `EP` Jira project prefix, the tech-stack/convention text, or anything inside the
 gitignored nested repos.
 
+**Shared changes propagate to all branches.** A new `.claude/skills/*`, agent, hook, or a
+shared engineering rule in `CLAUDE.md` is not instance-specific — commit it on the current
+branch, then `git cherry-pick -x <sha>` it onto every other instance branch (`git branch`)
+so instances don't drift. Keep instance-specific work (`docs/plans/*`, ticket docs) on its
+own branch only.
+
 ## Inputs
 
 - **New instance label** — the short display name (e.g. `VSE`). Ask the user if not given.
@@ -54,8 +60,12 @@ grep -rc "$OLD" CLAUDE.md .claude docs 2>/dev/null | grep -v ':0$'   # expect: n
 Scope `grep` to `CLAUDE.md .claude docs` so the gitignored nested repos are never scanned.
 A plain `$OLD → $NEW` swap covers `SEAS / ERANET`, `SEAS/ERANET`, and standalone `SEAS`.
 
-**Watch two traps the plain swap misses:**
+**Watch these traps the plain swap misses:**
 
+- **Skill/doc bodies carry the label too.** Nested-repo branch names like `<label>_test`
+  and absolute `C:\Innovis\<label>` paths inside `.claude/skills/**` and `docs/**` bodies are
+  relabel targets, not just `CLAUDE.md`. After the swap run `grep -rni "$OLD" .claude docs`
+  (and the old branch name / path) and fix residue by hand.
 - **Case variants.** The label also appears lower/mixed-case (`seas_test`, `PublicSeasDS`), which
   a case-sensitive swap skips. After the swap, run `grep -rni "$OLD" CLAUDE.md .claude docs` and
   fix every residual by hand.

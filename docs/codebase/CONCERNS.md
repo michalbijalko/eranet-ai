@@ -326,6 +326,7 @@
 - **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/StatisticsService.java`, `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/statistics/` (124 native SQL query classes)
 - **Why fragile:** Hand-built SQL query construction using `StringBuilder` with filter chaining and string-replaced `IN (#)` ID lists. Any change to filter logic risks breaking query structure. No tests exist.
 - **Safe modification:** Only modify one filter path at a time; test with the full statistics export UI after every change.
+- **Two render paths — Excel ≠ on-screen.** The Excel export is server-rendered (`getFormattedValue` / `codebookService.translate` in `StatisticsService`), but the on-screen report is **client-rendered**: header from the `statisticsField` codebook (`codebookGenerator.js`), value from a `filters[identificator]` codebook filter (`showStatisticsList.js`). A new codebook statistics attribute needs the server `StatisticsField` **and** three client additions (`constants.js` identificator, `codebookGenerator.js` `statisticsField` header entry, `showStatisticsList.js` value filter) — otherwise Excel is correct while the browser report shows raw codes and a blank column header. (EP-13137.)
 
 ### File Binary Storage in MySQL (`FileDao.java`)
 
