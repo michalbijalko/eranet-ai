@@ -333,6 +333,13 @@
 - **Why fragile:** Binary file data is stored as BLOBs directly in MySQL (`SELECT data FROM file WHERE id = ?`). Large file uploads will cause memory pressure. The DAO uses `PreparedStatement` with `?` placeholders correctly (no injection risk), but the pattern does not scale.
 - **Test coverage:** None.
 
+### Procurement-request forms — shared fields, label-as-match-key
+
+- **Files:** `publicERANET-client/app/views/planning/{internalProcurementRequest,externalProcurementRequest,editInternalRequest,editExternalRequest}/*.html`, `app/scripts/service/codebookGenerator.js`, `CodebookService.java`, the request PDF services, `StatisticsService.java`.
+- **Two distinct module families carry the same attributes:** *Internal/External **Procurement** Request* (`editInternalProcurementRequest` / `editExternalProcurementRequest`, modules Požiadavky IO/VO) and *Internal/External Request* base (`editInternalRequestBase` / `editExternalRequestBase`). A ticket naming "procurement request" means **only** the first pair — scope edits to the exact module named, and reconcile any subagent's ambiguous form labels against the ticket wording before editing.
+- **A field's Slovak label string doubles as a field-config match key.** Client: `showByFieldOrderConfiguration(fieldId, '<label>')` / `requiredByFieldConfiguration('<label>')`; server: `CodebookService` config-map values compared via `"<label>".equals(field)` in the PDF services. These are **two independent lockstep groups** (client matches client, server matches server) — every occurrence in a group must be byte-identical or the field silently disappears / required-validation breaks. The order/required config is persisted by **numeric `fieldId`**, so a label rename needs no DB migration.
+- **One i18n key can be shared by several forms** (e.g. `INTERNAL_REQUEST_CONTRACT_CONTAINS_SENSITIVE_INFO` labels all four request forms). To relabel only a subset, add a **per-module key** instead of changing the shared value.
+
 ---
 
 ## Performance Notes
