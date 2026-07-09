@@ -19,6 +19,11 @@ core discipline of TTSK development.
 3. If the ticket has images: Jira images cannot be read by the agent — **ask the user to
    paste the image** before assuming intent.
 
+> **Jira reachable check:** a `system-reminder` listing some Atlassian connectors as needing
+> auth does **not** mean Jira is unreachable — a working connector is usually present. Try
+> `getAccessibleAtlassianResources` → `getJiraIssue` (site `innovis.atlassian.net`) before
+> telling the user to paste the ticket; fall back to asking only if the call itself fails.
+
 ## Commit format (mandatory)
 
 ```
