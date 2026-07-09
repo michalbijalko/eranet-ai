@@ -97,6 +97,7 @@ These skills encode SEAS-specific rules for each activity. **Read the relevant s
 | `authentication` | Touching login flows, session handling, SSO, protected endpoints | Local / SAML 2.0 (ÚPVS) / OIDC — which service to extend, what not to touch |
 | `ui-design` | Building or restyling any UI | Bootstrap 3 + SmartAdmin + `ui.bootstrap` — reuse existing components, no new libs, localization rules |
 | `testing` | Writing tests or verifying a change | Karma/Jasmine client tests; browser smoke testing; critical flows to always check |
+| `acceptance-test-checklist` | Right before manually testing a finished ticket | Generate an in-session clickable Slovak test checklist from the ticket's acceptance criteria (Pass/Fail per step); results drive close+commit or fixes |
 | `deployment` | Releasing / deploying a change | Maven WAR build → Liquibase migrations → WildFly hot-deploy; dev environment quick start |
 | `feasibility` | New idea or unknown scope before planning | Go-no-go pass: frame the ask, check existing codebase, assess doability and effort, give a recommendation |
 | `documentation` | Writing or updating docs | What to produce, format (`docs/` or Nuklino), keep in sync with code changes |
