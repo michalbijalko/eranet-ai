@@ -137,6 +137,10 @@ Scaffolded from `generator-angular 0.8.0` (Yeoman), noted at top of `publicERANE
 | `maven-dependency-plugin` | 2.6 | Copy endorsed JARs |
 | `eclipselink-staticweave-maven-plugin` | 1.0.3 | EclipseLink static weaving for JPA entities |
 
+> **Build JDK:** the Maven build must run under **JDK 8** (e.g. `JAVA_HOME=…\jdk1.8.0_351`). A
+> default JDK 21/23 breaks the Java 8 annotation processors (Lombok / EclipseLink static weaving)
+> with `NoSuchFieldError … JCImport qualid`.
+
 ### Application Server
 
 **Target Runtime:** WildFly 26.1.3 (JNDI name pattern `PublicTrnavavucDS` in `persistence.xml`; WildFly path referenced in `configS.bat`)
