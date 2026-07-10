@@ -28,6 +28,10 @@ grunt test         # clean:server -> concurrent:test -> autoprefixer -> connect:
 grunt karma        # Runs karma unit config directly (singleRun: true in Gruntfile)
 ```
 
+> **Caveat:** the Karma 0.12 suite does **not** start on modern Node (e.g. Node 24) — its bundled
+> socket.io crashes (`Cannot read properties of undefined (reading 'prototype')`). Don't burn time
+> forcing it; rely on manual browser smoke testing until the stack is upgraded.
+
 ### Test File Locations
 
 **Unit tests:**
