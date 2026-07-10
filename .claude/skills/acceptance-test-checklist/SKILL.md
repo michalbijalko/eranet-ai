@@ -59,6 +59,15 @@ without guessing — grounded in the plan, not generic:
   `--text-secondary`, `--text-muted`, `--border`, `--border-strong`, `--text-accent`, `--bg-accent`,
   `--radius`, `--font-sans`); start with a visually-hidden `<h2 class="sr-only">` summary; no
   horizontal page scroll. Use green for Prešlo, red for Zlyhalo, neutral for Neotestované.
+- **Widget reliability (do this or clicks silently die):**
+  - **Render the option buttons as STATIC HTML** — three `<button class="opt" data-v="none|pass|fail">` per step, written directly in the markup. Do **not** build the buttons dynamically in the script (if that one script throws mid-loop, every button *and* the send handler fail and clicking does nothing — the exact bug seen on EP-13134).
+  - **Use ONE delegated click listener** on the root container (`root.addEventListener('click', e => { var opt = e.target.closest('.opt'); … })`), not per-button `onclick`s. One handler, attached first, survives any later hiccup.
+  - Track state on each `.step` via a `data-state` attribute; recompute the counts by scanning `.step[data-state]`.
+  - **Colour the whole ROW, not just the button** — testers rely on the line itself going green/red to see what's already marked. Drive it purely from `data-state` with CSS attribute selectors: `.step[data-state="pass"] { background: var(--bg-success); border-color: var(--border-success); }` and the `--danger` equivalent; add a small "✓ Prešlo" / "✗ Zlyhalo" pill on the row via a `.mark` element shown by the same selectors. The per-button highlight alone is not enough.
+  - **Guard the send:** `if (typeof sendPrompt === 'function') sendPrompt(msg);` — and give the button `type="button"`.
+  - Define the `sr-only` class yourself (`position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)`) — it is not provided.
+  - Keep the initial "Zostáva" count equal to the real number of steps.
+- **If the user reports the widget doesn't respond**, don't keep re-rolling blindly — fix the pattern above and re-render; as an immediate unblock you may also paste the same checklist as a plain **numbered Slovak markdown list** they can reply to (e.g. "1 ok, 2.4 fail — …"). The markdown list is the guaranteed fallback; the widget is the nicety.
 
 ### 4. Act on the result
 When the user sends the results back (via the button or by telling you):
