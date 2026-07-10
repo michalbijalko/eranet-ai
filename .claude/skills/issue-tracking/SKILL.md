@@ -18,6 +18,10 @@ core discipline of SEAS development.
    message. Look them up in `docs/TICKETS.md`.
 3. If the ticket has images: Jira images cannot be read by the agent — **ask the user to
    paste the image** before assuming intent.
+4. **Check cross-ticket dependencies** — read the ticket's Jira issue links (clone/relates/blocks)
+   and scan its acceptance criteria for references to a column/field/attribute owned by *another*
+   ticket. If a sibling must land first (its artifact is a precondition), sequence that one first
+   and confirm the order with the user.
 
 > **Jira reachable check:** a `system-reminder` listing some Atlassian connectors as needing
 > auth does **not** mean Jira is unreachable — a working connector is usually present. Try
@@ -53,6 +57,10 @@ The workspace is **three independent Git repos**, not one:
 
 - Commit code in the repo it lives in. One ticket touching both sides → **one commit per
   repo**, same `feat|fix(STORY, DEV)` message.
+- **Confirm the checked-out branch before committing.** Epic feature work lands on a shared
+  `feat/EP-XXXX` branch checked out in *both* nested repos (e.g. `feat/EP-13132`), one commit
+  per story; the umbrella sits on the current client-instance branch (e.g. `seps`), not always
+  `master`/`sepsas_test`.
 - The umbrella repo often holds unrelated staged/untracked changes. **Scope every umbrella
   commit to its files** (`git commit -- <path>`) so you don't sweep up in-flight work.
 - Never `git add` the `publicERANET-*` directories from the umbrella — they are nested repos
