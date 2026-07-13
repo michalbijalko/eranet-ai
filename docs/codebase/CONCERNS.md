@@ -244,6 +244,16 @@
 - **Files:** `publicERANET-server/eranet-dao/src/main/java/sk/innovis/eranetpublic/server/dao/ProcurementDao.java`, `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/ProcurementDataRetentionService.java`
 - **Fix approach:** At minimum log the exception; preferably rethrow as a typed application exception.
 
+### Supplier-rating approval — parallel patterns not back-ported to `reopenRating` / send-for-approval popup
+
+- **Severity:** LOW
+- **Issue:** EP-13135 (approval delegation) fixed three issues in its own slice that the pre-existing sibling flows still carry. They were left untouched to keep one-ticket-per-commit; recorded here rather than as tickets.
+  1. **History record pushed before the HTTP call.** `reopenRating()` in `editSupplierRating.js` pushes its `EntriesHistory` item into `historyToSave` *before* the server call, so a failed call leaves a phantom record that the next successful save persists. The delegation flow was changed to push the item inside the success callback; `reopenRating` (and the same shape in `sendRatingForConfirmation`) still push early.
+  2. **Missing `rating == null` guard.** `SrRatingHeaderService.reopenRating()` calls `getEntityByIdInternal(id)` without a null check, so an unknown/tampered `ratingId` NPEs into an HTTP 500 instead of a 400. `delegateApproval()` added the guard; `reopenRating` did not get it.
+  3. **Stale codebook in the send-for-approval popup.** `approverSupplierRatingPopup.js` reads the approvers list from the global `ServerSettings` cache, so a codebook change made after app load is not reflected until reload. The delegation popup was switched to `ServerSettings.loadSettingByName('sr_approval_persons', …)` — a single targeted `setting/query` that doesn't touch the global cache (invalidating the whole cache triggers app-wide dependent re-fetches). The send-for-approval popup still reads the cache.
+- **Files:** `publicERANET-client/app/scripts/controllers/supplierRating/editSupplierRating.js` (`reopenRating`), `publicERANET-client/app/scripts/controllers/supplierRating/approverSupplierRatingPopup.js`, `publicERANET-server/public-eranet/src/main/java/sk/innovis/eranetpublic/server/service/SrRatingHeaderService.java` (`reopenRating`).
+- **Fix approach:** Apply the same three fixes to the sibling flows if/when either is next touched.
+
 ---
 
 ## TODO / FIXME Markers
