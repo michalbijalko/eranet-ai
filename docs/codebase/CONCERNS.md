@@ -333,6 +333,12 @@
 - **Why fragile:** Binary file data is stored as BLOBs directly in MySQL (`SELECT data FROM file WHERE id = ?`). Large file uploads will cause memory pressure. The DAO uses `PreparedStatement` with `?` placeholders correctly (no injection risk), but the pattern does not scale.
 - **Test coverage:** None.
 
+### `ServerSettings` global cache is app-wide — don't invalidate it for a local need
+
+- **Files:** `publicERANET-client/app/scripts/service/resources/serverSettings.js`
+- **Why fragile:** `ServerSettings` loads all settings once and caches them (`loaded` flag); many feature areas read that shared cache lazily. Forcing a full reload (resetting `loaded` and re-querying) makes unrelated screens re-fetch their dependent data (current rating, harmonogram, users, codebooks) — a visible cascade.
+- **Safe modification:** to read one setting freshly without touching the cache, use `ServerSettings.loadSettingByName(name, cb)` — a single targeted `setting/query`. Never reset the global cache for a localized refresh. (Added EP-13135: a delegation popup that reset the cache to get a fresh value triggered exactly this cascade; the user rejected it.)
+
 ---
 
 ## Performance Notes
