@@ -351,6 +351,12 @@
 - **A field's Slovak label string doubles as a field-config match key.** Client: `showByFieldOrderConfiguration(fieldId, '<label>')` / `requiredByFieldConfiguration('<label>')`; server: `CodebookService` config-map values compared via `"<label>".equals(field)` in the PDF services. These are **two independent lockstep groups** (client matches client, server matches server) — every occurrence in a group must be byte-identical or the field silently disappears / required-validation breaks. The order/required config is persisted by **numeric `fieldId`**, so a label rename needs no DB migration.
 - **One i18n key can be shared by several forms** (e.g. `INTERNAL_REQUEST_CONTRACT_CONTAINS_SENSITIVE_INFO` labels all four request forms). To relabel only a subset, add a **per-module key** instead of changing the shared value.
 
+### `ServerSettings` global cache is app-wide — don't invalidate it for a local need
+
+- **Files:** `publicERANET-client/app/scripts/service/resources/serverSettings.js`
+- **Why fragile:** `ServerSettings` loads all settings once and caches them (`loaded` flag); many feature areas read that shared cache lazily. Forcing a full reload (resetting `loaded` and re-querying) makes unrelated screens re-fetch their dependent data (current rating, harmonogram, users, codebooks) — a visible cascade.
+- **Safe modification:** to read one setting freshly without touching the cache, use `ServerSettings.loadSettingByName(name, cb)` — a single targeted `setting/query`. Never reset the global cache for a localized refresh. (Added EP-13135: a delegation popup that reset the cache to get a fresh value triggered exactly this cascade; the user rejected it.)
+
 ---
 
 ## Performance Notes
