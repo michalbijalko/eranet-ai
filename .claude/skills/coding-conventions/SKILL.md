@@ -203,6 +203,8 @@ public class ExampleEntity implements Serializable, HasId {
 - **Data inserts** → raw SQL scripts only.
 - Changeset author: **`m.bijalko`** always.
 - Apply migrations with `configS.bat` before starting WildFly.
+- `configS.bat` is gitignored and holds DB credentials — never `git rm` it (that deletes the
+  working copy); use `git rm --cached` to untrack any such local file.
 - When backfilling a JPA enum stored as **ordinal** via raw SQL, keep the literal ints aligned
   with the enum's declaration order, and never reorder persisted enum constants.
 
