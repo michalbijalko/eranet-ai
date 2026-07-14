@@ -106,6 +106,12 @@ All REST URLs start with `webresources/sc/`.
 - To clear a `ui-select` back to empty, set the model to `undefined` — `null` does **not**
   clear the selection, even when the empty option's id is `null`. (EP-13137 AC#8 reset.)
 
+### fire-and-forget reload gotcha
+
+- When a UI refresh depends on data a **fire-and-forget** notification/side-effect endpoint
+  writes server-side, trigger the reload **inside that call's success callback**, not in
+  parallel — otherwise the reload GET races the write and shows stale data until the next refresh.
+
 ---
 
 ## Java (server — Java 8 / Java EE 7)
@@ -197,6 +203,8 @@ public class ExampleEntity implements Serializable, HasId {
 - **Data inserts** → raw SQL scripts only.
 - Changeset author: **`m.bijalko`** always.
 - Apply migrations with `configS.bat` before starting WildFly.
+- When backfilling a JPA enum stored as **ordinal** via raw SQL, keep the literal ints aligned
+  with the enum's declaration order, and never reorder persisted enum constants.
 
 ## What to check before writing code
 
