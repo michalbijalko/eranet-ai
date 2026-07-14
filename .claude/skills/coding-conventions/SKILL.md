@@ -197,6 +197,8 @@ public class ExampleEntity implements Serializable, HasId {
 - **Data inserts** → raw SQL scripts only.
 - Changeset author: **`m.bijalko`** always.
 - Apply migrations with `configS.bat` before starting WildFly.
+- `configS.bat` is gitignored and holds DB credentials — never `git rm` it (that deletes the
+  working copy); use `git rm --cached` to untrack any such local file.
 
 ## What to check before writing code
 
