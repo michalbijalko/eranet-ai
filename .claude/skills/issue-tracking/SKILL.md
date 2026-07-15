@@ -15,7 +15,10 @@ core discipline of TTSK development.
 1. **Read the Jira ticket** via the Atlassian MCP (`EP-XXXX`). Requirements come from the
    ticket, not from guessing or memory.
 2. Note the **Story ticket** and its paired **Dev ticket** — both are needed for the commit
-   message. Look them up in `docs/TICKETS.md`.
+   message. Look them up in `docs/TICKETS.md`. The Dev ticket is typically the Story's
+   **Dev Sub-task** (stories also carry a parallel Test Sub-task). If the pair isn't in
+   `docs/TICKETS.md`, fetch the Story's subtasks (`getJiraIssue`, `fields: ["subtasks"]`) to
+   find it, then add the TICKETS.md row.
 3. If the ticket has images: Jira images cannot be read by the agent — **ask the user to
    paste the image** before assuming intent.
 4. **Check cross-ticket dependencies** — read the ticket's Jira issue links (clone/relates/blocks)
