@@ -1,8 +1,8 @@
-# TTSK / ERANET — Ticket-Driven Development
+# PSK / ERANET — Ticket-Driven Development
 
 ## What This Is
 
-TTSK (ERANET Public) is a production Slovak public-procurement (e-tender) platform: a Java EE 7 REST/WebSocket backend (`publicERANET-server`) and an AngularJS 1.x SPA (`publicERANET-client`), backed by MySQL. This milestone is not a rewrite — it is an **ongoing, Jira-ticket-driven stream of new features and bug fixes** on the existing system, governed by a strict set of engineering conventions so that AI-assisted changes stay consistent, traceable, and faithful to the existing codebase.
+PSK (ERANET Public) is a production Slovak public-procurement (e-tender) platform: a Java EE 7 REST/WebSocket backend (`publicERANET-server`) and an AngularJS 1.x SPA (`publicERANET-client`), backed by MySQL. This milestone is not a rewrite — it is an **ongoing, Jira-ticket-driven stream of new features and bug fixes** on the existing system, governed by a strict set of engineering conventions so that AI-assisted changes stay consistent, traceable, and faithful to the existing codebase.
 
 ## Core Value
 
@@ -15,7 +15,7 @@ Every change traces to exactly one Jira ticket, follows the existing codebase pa
 <!-- Inferred from the existing codebase (docs/codebase/). These already work and are relied upon. -->
 
 - ✓ Public-procurement lifecycle: procurement, qualification, planning, evaluation, communication domains — existing
-- ✓ Authentication & SSO: Java EE FORM login, UPVS SAML 2.0 SSO, OIDC/JWT — existing
+- ✓ Authentication & SSO: Java EE FORM login, UPVS SAML 2.0 SSO — existing (no OIDC in this instance)
 - ✓ Role-based authorization (administrator, user, supplier, statutory, confirmancePerson, responsiblePerson, systemAdministrator) — existing
 - ✓ REST API (JAX-RS / RESTEasy) over JPA/EclipseLink entities on MySQL — existing
 - ✓ Real-time WebSocket notifications / procurement-room chat — existing

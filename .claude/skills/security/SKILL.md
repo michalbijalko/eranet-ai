@@ -1,15 +1,15 @@
 ---
 name: security
-description: Security guidelines for TTSK - role-based access, secrets handling, input sanitization, and the rule that sensitive config never lives in code. Use whenever adding endpoints, handling credentials, integrating external systems, or when the user mentions "security", "oprávnenia", "API kľúč", "roly".
+description: Security guidelines for PSK - role-based access, secrets handling, input sanitization, and the rule that sensitive config never lives in code. Use whenever adding endpoints, handling credentials, integrating external systems, or when the user mentions "security", "oprávnenia", "API kľúč", "roly".
 ---
 
 # Security
 
-TTSK is a public-procurement platform with legal obligations. These rules are mandatory.
+PSK is a public-procurement platform with legal obligations. These rules are mandatory.
 
 ## Hard rules
 
-- **No secrets in code.** OIDC `ClientSecret`, SMTP passwords, and any API credentials
+- **No secrets in code.** SMTP passwords and any API credentials
   live in the `Setting` table (DB-driven config), not in source files. Never commit them.
 - **Never call external/third-party systems from the browser.** All outbound calls to UVO,
   EKS, URSO, ProEBiz (SOAP), or any other external system go through the Java server.
@@ -34,9 +34,10 @@ TTSK is a public-procurement platform with legal obligations. These rules are ma
 
 ## Input sanitization
 
-- `FindParametersSanitizer` (JAX-RS interceptor) strips forbidden filter fields from
-  `FindParameters` objects. Ensure new query parameters that must be server-controlled are
-  registered there and cannot be overridden by a client request.
+- **This instance has no JAX-RS sanitizing interceptor** — there is no `FindParametersSanitizer`
+  and no `interceptor/` package. Nothing strips client-supplied filter fields for you, so any
+  query parameter that must be server-controlled has to be enforced explicitly in the service
+  method. Do not assume a filter is safe because it arrived through `FindParameters`.
 - Validate and reject malformed input at the REST layer; don't pass unvalidated data into
   JPA queries.
 
@@ -44,7 +45,6 @@ TTSK is a public-procurement platform with legal obligations. These rules are ma
 
 | Secret | Location |
 |--------|----------|
-| OIDC ClientId, ClientSecret, TenantId, etc. | `Setting` table (DB) |
 | SMTP host, port, login, password | `Setting` table (DB) |
 | UVO / EKS API credentials | `Setting` table (DB) |
 | SAML signing keystores | `META-INF/alice2.jks` (test), `prod.jks` (prod) — committed |
