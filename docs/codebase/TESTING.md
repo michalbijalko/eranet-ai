@@ -4,7 +4,7 @@
 
 ## Summary
 
-This project has **minimal test coverage**. The client has Karma/Jasmine infrastructure configured but only a single stub spec file exists. The server has a `src/test/java` directory that is completely empty. No test files of any kind exist in the server module. Testing is configured but largely absent in practice.
+This project has **thin but real test coverage**. The client runs Karma/Jasmine with a handful of genuine specs alongside a leftover scaffold stub. The server has 13 JUnit test classes under `src/test/java`, covering enum logic, the Liquibase master changelog, external/internal request logic, system-user resolution, and Spinex serialization. Coverage is far from comprehensive, but it is not absent — treat the existing tests as a regression net worth keeping green.
 
 ---
 
@@ -152,21 +152,24 @@ before_script:
 
 **Test directory:** `publicERANET-server/src/test/java/` — **directory exists but contains no files**
 
-No test dependencies are declared in `publicERANET-server/pom.xml`:
-- No JUnit dependency
-- No Mockito dependency
-- No Arquillian dependency
-- No `surefire-plugin` configuration
+Test dependencies declared in `publicERANET-server/pom.xml`:
+- `junit:junit` (JUnit 4) — the main test framework
+- `org.junit.jupiter:junit-jupiter-params` — parameterized tests
+- `org.mockito:mockito-core` — mocking
+- `maven-surefire-plugin` — test execution
+- No Arquillian: there is no in-container integration testing
 
-**Conclusion: Zero server-side tests exist. No test framework is configured.**
+### Existing server tests
 
-### eranet-domain module
+13 JUnit test classes live under `src/test/java`. They are plain unit tests — JUnit 4 (`org.junit.Test`) with Mockito for collaborators, no container required:
 
-`publicERANET-server/eranet-domain/` — secondary module containing only a `src/main/resources/META-INF/` directory. No test directory, no Java sources, no test configuration.
+- `SystemUserServiceTest`, `SystemUserGroupTypeEnumTest`, and three `SystemUserAs*InExternalRequest*ServiceTest` classes — system-user resolution and group-type logic
+- Five `ExternalRequest*Test` classes — approval, notification scope, and enrichment logic
+- `InternalRequestNotificationFormatterTest` — notification formatting
+- `LiquibaseMasterChangelogTest` — guards the Liquibase master changelog
+- `SerializationTest` — Spinex request/response serialization
 
-### public-eranet module
-
-`publicERANET-server/public-eranet/` — contains service classes under `src/main/java/sk/innovis/eranetpublic/server/service/` but no `src/test/` tree. No tests.
+Run them with `mvn test` from `publicERANET-server/`. Keep them green — they are the only server-side regression net.
 
 ---
 

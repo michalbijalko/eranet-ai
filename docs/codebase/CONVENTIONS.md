@@ -314,7 +314,7 @@ public class Addendum implements Serializable, HasAttachment, HasId {
 
 - `AccessLocalException` (EJB security) → mapped to HTTP 403 by `AccessLocalExceptionHandler`
 - Business rule violations → `WebApplicationException` with appropriate `Response.Status`
-- Input sanitization via `FindParametersSanitizer` interceptor (`publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/interceptor/FindParametersSanitizer.java`) which strips forbidden filter fields from `FindParameters` objects
+- No JAX-RS sanitizing interceptor exists in this instance — server-controlled filter fields must be enforced explicitly in the service method, not assumed safe because they arrived via `FindParameters`
 - `logger.warn()` used when forbidden operations are attempted
 
 ### Logging (Server)

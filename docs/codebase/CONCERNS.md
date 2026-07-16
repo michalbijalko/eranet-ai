@@ -12,7 +12,7 @@
 - **Issue:** The entire frontend is built on AngularJS 1.5.11 (confirmed via `publicERANET-client/app/bower_components/angular/angular.js` header). AngularJS reached end-of-life in December 2021. No security patches, no browser-compatibility fixes, and no community support will be issued.
 - **Files:** `publicERANET-client/bower.json` (`"angular": "~1.5.5"`), all of `publicERANET-client/app/scripts/`
 - **Impact:** Any future browser security changes or JavaScript engine updates may silently break the application. CVEs discovered in AngularJS will not be patched upstream.
-- **Fix approach:** Full migration to Angular 2+ (or React/Vue). This is a multi-sprint effort requiring a complete rewrite of the 643-file JS codebase under `publicERANET-client/app/scripts/`.
+- **Fix approach:** Full migration to Angular 2+ (or React/Vue). This is a multi-sprint effort requiring a complete rewrite of the 753-file JS codebase under `publicERANET-client/app/scripts/`.
 
 ### Bower (Deprecated)
 
@@ -20,8 +20,7 @@
 - **Issue:** Bower was officially deprecated in 2017. It is no longer maintained, its registry may go offline, and new packages are not published to it. The project uses `publicERANET-client/bower.json` exclusively for frontend dependency management.
 - **Files:** `publicERANET-client/bower.json`, `publicERANET-client/Gruntfile.js` (task: `bowerInstall`)
 - **Impact:** Dependency resolution at install time may fail or produce inconsistent results. Security auditing (e.g., `npm audit` equivalent) is not available for Bower packages.
-- **Additional concern:** `publicERANET-client/app/bower_components/` is present in the repository despite being listed in `.gitignore` (line 5 of `publicERANET-client/.gitignore`). This means ~55 vendored frontend libraries — including CKEditor 4.6.2 (superseded by 4 LTS), jQuery, Bootstrap 3, etc. — are committed to version control, inflating repo size and making upgrades invisible.
-- **Fix approach:** Migrate to npm/yarn; remove `bower_components` from repo and restore via `.gitignore`; consolidate vendored assets.
+- **Fix approach:** Migrate to npm/yarn; consolidate vendored assets.
 
 ### Grunt 0.4.x (Legacy)
 
@@ -35,25 +34,13 @@
 ### Karma / ng-scenario (Obsolete Test Runner)
 
 - **Severity:** MEDIUM
-- **Issue:** `karma ~0.12.31` and `karma-ng-scenario ~0.1.0` are used for client-side tests. `ng-scenario` was the original AngularJS e2e runner and was replaced by Protractor (itself now deprecated) and later Cypress. Only one test controller file exists: `publicERANET-client/test/spec/controllers/main.js`.
+- **Issue:** `karma ~0.12.31` and `karma-ng-scenario ~0.1.0` are used for client-side tests. `ng-scenario` was the original AngularJS e2e runner and was replaced by Protractor (itself now deprecated) and later Cypress.
 - **Files:** `publicERANET-client/karma.conf.js`, `publicERANET-client/karma-e2e.conf.js`, `publicERANET-client/package.json`
-- **Impact:** Effectively no functioning automated tests for the frontend. The single test file is a yeoman-generated stub.
+- **Impact:** A handful of real spec files exist (`test/spec/controllers/companyProfile/*.spec.js`, `test/spec/controllers/externalRequest/editExternalRequestBase.spec.js`, `test/spec/i18nKeys.spec.js`, `test/unit/controllers/planningExternal/*.js`), but coverage is thin against 435 controller files, and the runner itself (`ng-scenario`) is obsolete.
 
 ---
 
 ## Security Concerns
-
-### Hardcoded Keystore Passwords in Source Code
-
-- **Severity:** HIGH (CRITICAL)
-- **Issue:** The SAML signing credential initialisation hardcodes both the keystore password and the private key alias password directly in Java source code.
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/saml/SAMLClient.java` lines 945–946
-  ```java
-  char[] keystorePass = "jNTYEYEVYUJM0eanM2xV".toCharArray();
-  char[] aliasPass    = "yz?dw\"XU%.bG8%;%:LGB".toCharArray();
-  ```
-- **Impact:** Any developer with repository access has the keystore and private key passwords. Rotating credentials requires a code change and redeployment. The associated keystore files (`prod.jks`, `alice2.jks`) are also committed to the repository at `publicERANET-server/src/main/resources/META-INF/`.
-- **Fix approach:** Move both passwords to JNDI resources or environment variables. Remove all `.jks` files from the repository and serve them from a secrets vault or application server configuration.
 
 ### Production Keystore Files Committed to Repository
 
@@ -67,7 +54,7 @@
 
 - **Severity:** HIGH
 - **Issue:** `configS.bat` (project root) contains a Liquibase migration command with the database root password in plaintext in the `--password` flag.
-- **File:** `C:\Innovis\trnavavuc\configS.bat`
+- **File:** `C:\Innovis\psk\configS.bat`
 - **Impact:** The database root password is stored in a committed script. It is also used with `&ssl=false`, disabling TLS for the MySQL connection.
 - **Fix approach:** Use a Liquibase `.properties` file (excluded from version control) or environment variable substitution. Enable SSL/TLS on the MySQL connection.
 
@@ -106,10 +93,10 @@
 - **File:** `publicERANET-server/src/main/webapp/WEB-INF/web.xml` lines 6–8
 - **Fix approach:** Add `<secure>true</secure>` and `<http-only>true</http-only>` inside `<cookie-config>`.
 
-### SAML Library (OpenSAML 2.6.4) End of Life
+### SAML Library (OpenSAML 2.6.1) End of Life
 
 - **Severity:** HIGH
-- **Issue:** `opensaml` 2.6.4 (released ~2014) is the version used for SAML processing. OpenSAML 2.x reached end-of-life in 2016; the current stable is 4.x. The `java-saml` wrapper is at 2.2.0 (current is 3.x). Both libraries have known vulnerabilities (XML signature wrapping, XXE).
+- **Issue:** `opensaml` 2.6.1 (released ~2013) is the version used for SAML processing. OpenSAML 2.x reached end-of-life in 2016; the current stable is 4.x. The `java-saml` wrapper is at 2.2.0 (current is 3.x). Both libraries have known vulnerabilities (XML signature wrapping, XXE).
 - **Files:** `publicERANET-server/pom.xml` lines 56–59, 52–54
 - **Fix approach:** Upgrade to `opensaml` 4.x and `java-saml-core` 3.x; the API is not backward-compatible — the `SAMLClient.java` implementation must be rewritten.
 
@@ -117,36 +104,17 @@
 
 ## Outdated / Vulnerable Java Dependencies
 
-### jackson-databind 2.4.0
-
-- **Severity:** HIGH
-- **Issue:** `jackson-databind` 2.4.0 (2014) has numerous known critical CVEs including polymorphic deserialization RCE vulnerabilities: CVE-2019-14379, CVE-2020-8840, CVE-2020-9547, CVE-2020-9548, and others (collectively known as the "gadget chain" series).
-- **File:** `publicERANET-server/pom.xml` line 141
-- **Fix approach:** Upgrade to 2.17.x or later. Also note a second Jackson dependency via `jackson-jaxrs-json-provider 2.3.2` (pom.xml line 84).
-
-### commons-beanutils 1.9.2
-
-- **Severity:** HIGH
-- **Issue:** Known CVE-2019-10086 (ClassLoader manipulation). Upgrade to 1.9.4+.
-- **File:** `publicERANET-server/pom.xml` line 95
-
 ### commons-io 2.4
 
 - **Severity:** MEDIUM
 - **Issue:** Version from 2012. Current is 2.16+. Several older utility method behaviors differ from modern expectations.
 - **File:** `publicERANET-server/pom.xml` line 99
 
-### Apache HttpClient 4.3.1
+### Apache HttpClient 4.5
 
 - **Severity:** MEDIUM
 - **Issue:** CVE-2020-13956 (improper handling of malformed authority component). Upgrade to 4.5.14+.
 - **File:** `publicERANET-server/pom.xml` line 133
-
-### Guava 18.0
-
-- **Severity:** MEDIUM
-- **Issue:** CVE-2023-2976 (temp directory creation insecure on Unix). Upgrade to 32.0+.
-- **File:** `publicERANET-server/pom.xml` line 145
 
 ### Spring Beans 2.5.6.SEC03
 
@@ -189,30 +157,30 @@
 - **Severity:** HIGH
 - **Issue:** Several service classes are extremely large, combining REST endpoint definition, business logic, validation, and data access in a single file. This makes them hard to test, maintain, or modify safely.
 - **Files and sizes:**
-  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ProcurementService.java` — 9,596 lines
-  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UvoService.java` — 6,431 lines
-  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/CompanyInProcurementService.java` — 5,369 lines
-  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/pdf/ProcurementAllPdfGeneratingService.java` — 4,879 lines
-  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ParticipantConditionInProcurementService.java` — 4,706 lines
+  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ProcurementService.java` — 7,396 lines
+  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UvoService.java` — 6,407 lines
+  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/CompanyInProcurementService.java` — 5,281 lines
+  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/pdf/ProcurementAllPdfGeneratingService.java` — 4,819 lines
+  - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ParticipantConditionInProcurementService.java` — 4,273 lines
 - **Impact:** High cyclomatic complexity, zero automated tests, fragile to any change.
 - **Fix approach:** Extract business logic into dedicated domain service classes; separate REST layer from business logic layer; introduce unit tests incrementally.
 
 ### Large AngularJS Controller Files
 
 - **Severity:** MEDIUM
-- **Issue:** Several frontend controller files are 600–1,626 lines, violating single-responsibility.
+- **Issue:** Several frontend controller files are 600–1,881 lines, violating single-responsibility.
 - **Files:**
-  - `publicERANET-client/app/scripts/controllers/communication/communication.js` — 1,626 lines
-  - `publicERANET-client/app/scripts/controllers/procurement/preparationPhase/procurementDefinition/generalInformation.js` — 1,281 lines
-  - `publicERANET-client/app/scripts/controllers/planning/editInternalRequest/editInternalRequestBase.js` — 1,246 lines
+  - `publicERANET-client/app/scripts/controllers/communication/communication.js` — 1,691 lines
+  - `publicERANET-client/app/scripts/controllers/procurement/preparationPhase/procurementDefinition/generalInformation.js` — 1,239 lines
+  - `publicERANET-client/app/scripts/controllers/planning/editInternalRequest/editInternalRequestBase.js` — 1,788 lines
   - `publicERANET-client/app/scripts/app.js` — 1,881 lines (routing + module config)
 
 ### Statistics Service Uses String-Concatenated SQL
 
 - **Severity:** MEDIUM
 - **Issue:** `StatisticsService.java` builds SQL queries by string concatenation using a `StringBuilder`, including dynamically inserting integer ID lists (sourced from other queries). While the IDs appear to be typed integers from JPA results (reducing injection risk), the approach bypasses `PreparedStatement` parameterization entirely for these queries.
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/StatisticsService.java` lines 1352–1372
-- **Secondary:** 124 `setSqlQuery()` calls across `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/statistics/` classes each contain a hardcoded native SQL template with `IN (#)` that gets string-replaced at runtime.
+- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/StatisticsService.java`
+- **Secondary:** 57 `setSqlQuery()` calls across `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/statistics/` classes, with 83 occurrences of the `IN (#)` pattern that gets string-replaced at runtime.
 - **Fix approach:** Validate that all `#` substitution values are provably integer-typed before execution; alternatively convert to `PreparedStatement` with `setInt()`.
 
 ### Aspose Libraries as In-Project JARs
@@ -227,7 +195,7 @@
 
 - **Severity:** LOW
 - **Issue:** `LoggingHandler.java` logs all inbound and outbound SOAP messages to `System.out` using `System.out.println`. This is a debug artifact left in production code. SOAP messages may contain sensitive data.
-- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/LoggingHandler.java` lines 25, 38
+- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/LoggingHandler.java` lines 35, 40, 42, 47, 52, 54, 102, 107, 109
 - **Fix approach:** Replace `System.out.println` with `logger.debug()`; gate behind a feature flag or remove entirely.
 
 ### `e.printStackTrace()` in Production Code
@@ -237,13 +205,6 @@
 - **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/saml/SAMLClient.java` line 967, `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/ws/PingEndpoint.java`, `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UndeliveredEmailNotificationSchedulerService.java`
 - **Fix approach:** Replace with proper logger error calls and rethrow or fail-fast.
 
-### Empty Catch Blocks
-
-- **Severity:** MEDIUM
-- **Issue:** 10 empty catch blocks found across `ProcurementDao.java` (8 occurrences) and `ProcurementDataRetentionService.java` (2 occurrences). Exceptions are silently swallowed.
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/ProcurementDao.java`, `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ProcurementDataRetentionService.java`
-- **Fix approach:** At minimum log the exception; preferably rethrow as a typed application exception.
-
 ---
 
 ## TODO / FIXME Markers
@@ -252,7 +213,7 @@
 
 - **Severity:** MEDIUM
 - **Issue:** Three TODO comments in `UvoService.java` reference an unimplemented feature: sending an identifier for a dropdown field controlling qualification conditions.
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UvoService.java` lines 3078, 3318, 3325
+- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/UvoService.java` lines 3066, 3306, 3313
   ```java
   // TODO: po novom musím poslať identifikator rozbaľovacieho poľa...
   ```
@@ -261,21 +222,12 @@
 
 - **Severity:** LOW
 - **Issue:** TODOs reference Jira tickets that are deferred but not resolved.
-- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/InternalRequestService.java` lines 1252, 1256 (`EP-3908`), 1477 (`EP-3569`)
-
-### Notification Bug Suppressed (ScheduleService)
-
-- **Severity:** MEDIUM
-- **Issue:** Notification sending for qualification system levels with stages is intentionally disabled with a TODO referencing a Jira ticket.
-- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ScheduleService.java` line 1007
-  ```java
-  //TODO: fix v https://innovis.atlassian.net/browse/EP-8225, teraz len docasne neposiela notifikacie na KS so stupnami
-  ```
+- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/InternalRequestService.java` lines 2022, 2026 (`EP-3908`), 2310 (`EP-3569`)
 
 ### LoggingHandler Unhandled Exception
 
 - **Severity:** LOW
-- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/LoggingHandler.java` lines 36, 48
+- **File:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/proebiz/LoggingHandler.java` lines 44, 56, 111
   ```java
   // TODO: What do I have to do in this case?
   ```
@@ -287,27 +239,29 @@
   ```javascript
   // TODO: delete this function later on - no longer needed (?)
   ```
-- **File:** `publicERANET-client/app/scripts/controllers/procurement/preparationPhase/procurementDefinition/generalInformation.js` line 1261
-  ```javascript
-  // TODO consul
-  ```
+- **Files:** `// TODO consul` occurs at:
+  - `publicERANET-client/app/scripts/controllers/planning/changeInternalRequestCategory.js` line 44
+  - `publicERANET-client/app/scripts/controllers/planning/annualPlan/editAnnualPlanBase.js` line 770
+  - `publicERANET-client/app/scripts/controllers/planning/editInternalRequest/editInternalRequestBase.js` line 146
+  - `publicERANET-client/app/scripts/directives/annualPlansTable.js` lines 111, 346, 528
+  - `publicERANET-client/app/scripts/directives/internalRequestsTable.js` lines 117, 513
 
 ---
 
 ## Test Coverage Gaps
 
-### No Java Unit or Integration Tests
+### Limited Java Unit Test Coverage
 
-- **What's not tested:** The entire `publicERANET-server` backend — 823 Java source files, all REST endpoints, all business logic.
-- **Files:** `publicERANET-server/src/test/java/` directory exists but is empty.
-- **Risk:** Any refactoring, dependency upgrade, or bug fix has no automated regression safety net.
+- **What's tested:** `publicERANET-server/src/test/java` contains 13 real test classes: `SystemUserGroupTypeEnumTest`, `LiquibaseMasterChangelogTest`, five `ExternalRequest*Test` classes, `InternalRequestNotificationFormatterTest`, three `SystemUserAs*Test` classes, `SystemUserServiceTest`, and a Spinex `SerializationTest`. Coverage spans enums, the Liquibase master changelog, external/internal request logic, system-user logic, and Spinex serialization.
+- **What's not tested:** The bulk of the `publicERANET-server` backend — 1,046 Java source files total, most REST endpoints, and most business logic (including the god-class services above) have no automated coverage.
+- **Risk:** Refactoring, dependency upgrades, or bug fixes outside the covered areas have no automated regression safety net.
 - **Priority:** HIGH
 
-### Frontend Tests Are a Stub
+### Frontend Tests Are Thin
 
-- **What's not tested:** All 368 AngularJS controller files, all services, all directives.
-- **Files:** Only `publicERANET-client/test/spec/controllers/main.js` exists (yeoman scaffold boilerplate).
-- **Risk:** UI regressions are undetectable programmatically.
+- **What's tested:** A small set of real Karma/Jasmine specs exist: `test/spec/controllers/companyProfile/{editAdminUser,externalRequestSettings,responsiblePersonDialog}.spec.js`, `test/spec/controllers/externalRequest/editExternalRequestBase.spec.js`, `test/spec/i18nKeys.spec.js`, and `test/unit/controllers/planningExternal/{commentDetailModalSpec,decisionCaptureModalSpec}.js`.
+- **What's not tested:** The large majority of the 435 AngularJS controller files, plus most services and directives.
+- **Risk:** UI regressions outside the covered controllers are undetectable programmatically.
 - **Priority:** MEDIUM
 
 ---
@@ -317,12 +271,12 @@
 ### SAML Authentication (`SAMLClient.java`)
 
 - **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/saml/SAMLClient.java` (970 lines)
-- **Why fragile:** Uses EOL `opensaml 2.6.4`, hardcoded keystore passwords, `e.printStackTrace()` on credential failure (which leaves `signingCredential` null and causes NPE on first SAML operation), and repeated `intializeCredentials()` calls (lines 162, 442, 517, 580) rather than singleton initialization.
+- **Why fragile:** Uses EOL `opensaml 2.6.1`, `e.printStackTrace()` on credential failure (which leaves `signingCredential` null and causes NPE on first SAML operation), and repeated `intializeCredentials()` calls (lines 162, 442, 517, 580) rather than singleton initialization.
 - **Safe modification:** Any change must be tested against a live or mocked SAML IdP. Verify SAML SSO and SLO flows end-to-end after any modification.
 
 ### Statistics SQL Engine (`StatisticsService.java`, `StatisticsField.java`)
 
-- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/StatisticsService.java`, `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/statistics/` (124 native SQL query classes)
+- **Files:** `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/StatisticsService.java`, `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/serialization/dto/statistics/` (native SQL query classes — see "Statistics Service Uses String-Concatenated SQL" above for counts)
 - **Why fragile:** Hand-built SQL query construction using `StringBuilder` with filter chaining and string-replaced `IN (#)` ID lists. Any change to filter logic risks breaking query structure. No tests exist.
 - **Safe modification:** Only modify one filter path at a time; test with the full statistics export UI after every change.
 - **Two render paths — Excel ≠ on-screen.** The Excel export is server-rendered (`getFormattedValue` / `codebookService.translate` in `StatisticsService`), but the on-screen report is **client-rendered**: header from the `statisticsField` codebook (`codebookGenerator.js`), value from a `filters[identificator]` codebook filter (`showStatisticsList.js`). A new codebook statistics attribute needs the server `StatisticsField` **and** three client additions (`constants.js` identificator, `codebookGenerator.js` `statisticsField` header entry, `showStatisticsList.js` value filter) — otherwise Excel is correct while the browser report shows raw codes and a blank column header. (EP-13137.)
@@ -353,7 +307,7 @@
 ### No Frontend Build Minification in Development
 
 - **Severity:** LOW
-- **Problem:** The `app/scripts/` directory contains 643 unminified JavaScript files loaded individually in development. The bundled build (`dist/`) would be needed for production performance, but the Grunt build tooling is frozen at 2013 vintage.
+- **Problem:** The `app/scripts/` directory contains 753 unminified JavaScript files loaded individually in development. The bundled build (`dist/`) would be needed for production performance, but the Grunt build tooling is frozen at 2013 vintage.
 
 ---
 
@@ -374,14 +328,11 @@
 
 | Package | Current Version | Risk | Impact |
 |---------|----------------|------|--------|
-| `opensaml` | 2.6.4 | EOL since 2016 | SAML auth completely unpatched |
+| `opensaml` | 2.6.1 | EOL since 2016 | SAML auth completely unpatched |
 | `java-saml` | 2.2.0 | EOL, CVEs known | SAML parsing vulnerabilities |
-| `jackson-databind` | 2.4.0 | Multiple critical CVEs | Potential RCE via deserialization |
 | `spring-beans` | 2.5.6.SEC03 | EOL since 2013 | No patches; Spring4Shell unaddressed |
 | `resteasy-jaxrs` | 2.2.1.GA | EOL | REST layer unpatched |
-| `commons-beanutils` | 1.9.2 | CVE-2019-10086 | ClassLoader manipulation |
-| `httpclient` | 4.3.1 | CVE-2020-13956 | HTTP request hijacking |
-| `guava` | 18.0 | CVE-2023-2976 | Insecure temp file creation |
+| `httpclient` | 4.5 | CVE-2020-13956 | HTTP request hijacking |
 | `com.auth0:java-jwt` | 3.3.0 | CVE-2022-23529 | JWT header injection |
 | MySQL | 5.7 (Docker) | EOL Oct 2023 | No DB security patches |
 | AngularJS | 1.5.11 | EOL Dec 2021 | No frontend security patches |
@@ -422,7 +373,8 @@ Verify new deps by loading them under JDK 8, not just `mvn clean package`.
 
 - Case (EP-13100): `owasp-java-html-sanitizer` 20240325.1 ships a Java-10 shim
   (`org.owasp.shim.ForJava9AndLater`) → crash. Use **20220608.1** (last shim-free release)
-  and `<exclusion>` its transitive Guava 30.1 — the pinned Guava 18.0 has every API it calls.
+  and `<exclusion>` its transitive Guava 30.1 — the project's own pinned Guava (30.1-jre)
+  already provides every API it calls.
 
 ---
 

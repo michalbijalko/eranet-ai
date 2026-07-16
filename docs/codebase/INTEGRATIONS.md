@@ -6,7 +6,7 @@
 
 ## Domain Context
 
-This system is a **Slovak public-procurement management platform** (ERANET / TTSK — "Systém riadenia obstarávaní"). The domain involves:
+This system is a **Slovak public-procurement management platform** (ERANET / PSK — "Systém riadenia obstarávaní"). The domain involves:
 - Procurement tenders and qualification systems (supplier management)
 - Electronic auctions with real-time bidding
 - Document generation and archiving
@@ -30,20 +30,14 @@ This system is a **Slovak public-procurement management platform** (ERANET / TTS
 - IdP metadata: `publicERANET-server/src/main/resources/META-INF/idp.metadata.xml`
 - IdP metadata for VSE (partner institution): `publicERANET-server/src/main/resources/META-INF/idp.vse.metadata.xml`
 - SP metadata: `publicERANET-server/src/main/resources/META-INF/sp.metadata.xml`, `sp.vse.metadata.xml`
-- Library: `java-saml 2.2.0` (OneLogin) + `opensaml 2.6.4`
+- Library: `java-saml 2.2.0` (OneLogin) + `opensaml 2.6.1`
 - SAML logic: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/saml/` (`SAMLClient.java`, `SAMLInit.java`, `SAMLUtils.java`, `IdPConfig.java`, `SPConfig.java`, `AttributeSet.java`)
 - SSO service (UPVS-specific flow): `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/UpvsSsoService.java`
 - SAML assertions: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/SamlAssertionContainer.java`
 - Keystore for signing: `publicERANET-server/src/main/resources/META-INF/alice2.jks` and `prod.jks`
+- Additional dev/test certs and metadata: `publicERANET-server/src/main/resources/META-INF/dev.jks`, `dev.idp.metadata.xml`, `dev.sp.metadata.xml`, `fix.jks`
 
-### 3. OIDC / OAuth2 (OpenID Connect)
-
-**Provider:** Configurable OIDC provider (Microsoft Entra / Azure AD inferred from `TenantId` field)
-- Config class: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/configuration/OIDCConfiguration.java`
-  - Fields: `BaseURL`, `TenantId`, `ClientId`, `ClientSecret`, `StateSecret`, `Scope`, `RedirectURIPostfix`
-- REST service: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/OIDCService.java`
-- JWT handling: `nimbus-jose-jwt 9.37.3` + `java-jwt 3.3.0`
-- Client-side: `angularjs-oauth2 ~1.2.3` (`publicERANET-client/bower.json`)
+This instance has no OIDC/OAuth2 integration — authentication is local form login and SAML 2.0 (ÚPVS) only.
 
 ---
 
@@ -54,11 +48,11 @@ This system is a **Slovak public-procurement management platform** (ERANET / TTS
 - **Type:** MySQL 5.7
 - **Container name:** `eranet_mysql`
 - **Database name:** `eranet_db`
-- **JTA data source JNDI:** `PublicTrnavavucDS` (WildFly) / `PublicDS` (GlassFish legacy)
+- **JTA data source JNDI:** `EranetDS` (WildFly) / `PublicDS` (GlassFish legacy)
 - **Port (Docker):** `${MYSQL_PORT:-3307}:3306`
 - **Config:** `publicERANET-server/docker-compose.yml`
 - **Charset:** `utf8mb4`, collation `utf8mb4_slovak_ci`
-- **ORM:** EclipseLink 2.6.4 JPA; persistence unit `PublicTestPU`
+- **ORM:** EclipseLink 2.7.3 JPA; persistence unit `EranetPU`
 - **Persistence descriptor:** `publicERANET-server/src/main/resources/META-INF/persistence.xml`
 - **Schema migrations:** Liquibase — master changelog `publicERANET-server/src/main/sql/db.changelog-master.xml`; migration script runner `configS.bat`
 
@@ -80,11 +74,11 @@ This system is a **Slovak public-procurement management platform** (ERANET / TTS
 
 Commercial Aspose libraries are used to generate and process Office/PDF documents server-side:
 - `aspose-words 16.3.0` — Word document generation
-- `aspose-pdf 10.6.2` — PDF generation
+- `aspose-pdf 16.10.0` — PDF generation
 - `aspose-email 5.9.0` — Email/MSG file processing
 - `aspose-cells 8.5.2` — Excel file generation
 - License: `publicERANET-server/src/main/resources/META-INF/Aspose.Total.Java.lic` (loaded at startup in `AuthenticationService.java`)
-- JARs served from local Maven repo: `publicERANET-server/lib/`
+- `aspose-pdf` is pulled from the official Aspose Maven repository (`https://releases.aspose.com/java/repo/`); `aspose-words`, `aspose-email`, and `aspose-cells` are served from the in-project local repo `publicERANET-server/lib/`
 
 ### Apache POI
 
@@ -164,6 +158,39 @@ Used extensively throughout the codebase for:
 
 ---
 
+## External SOAP Web Service — SPINEX
+
+**Purpose:** SOAP integration with SPINEX, called from procurement, scheduling, agreement, and framework-agreement (harmonogram) flows
+- Service: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/spinex/SpinexService.java`
+- Request/response types: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/spinex/ExecuteRequest.java`, `ExecuteResponse.java`, `ObjectFactory.java`
+- Serialization DTOs: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/spinex/serialization/` (Action, Actions, Parameters, Procurement, ProcurementPart, Procurements, Status, WsReturn, plus date/timestamp XML adapters)
+- Duplicate generated client package: `publicERANET-server/src/main/java/sk/assecosolutions/spinex/` (`definitions/Spinex.java`, `definitions/SpinexService.java`, `schemas/`)
+- Callers: `ProcurementService.java`, `ScheduleService.java`, `AgreementService.java`, `HarmonogramInProcurementService.java`
+- WSDL: `publicERANET-server/src/main/resources/META-INF/spinex_schema.wsdl`
+- Truststores: `publicERANET-server/src/main/resources/META-INF/spinexrs-truststore-ca-prod.jks`, `spinexrs-truststore-ca-test.jks`
+- Test coverage: `publicERANET-server/src/test/java/sk/innovis/eranetpublic/server/spinex/SerializationTest.java`
+
+---
+
+## WOPI — Document Editing (e-Contracts)
+
+**Purpose:** Backs the e-contracts document-editing feature area, allowing in-browser editing of contract documents
+- Service: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/WopiService.java` (~819 lines)
+- Config: `publicERANET-server/src/main/resources/META-INF/wopi.xml`
+- Registered in: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ApplicationConfig.java`
+- Tied into: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/EcontractService.java` (~2,859 lines)
+
+---
+
+## Consul-Backed Configuration
+
+**Purpose:** Application configuration resolved from Consul at runtime, with a filesystem fallback when Consul is unavailable
+- Facade layer: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/config/` (`ConfigService.java`, `ConfigurationFacade.java`, `ConsulFacade.java`, `FileSystemConfigFacade.java`)
+- REST surface: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/rest/config/` (`InternalConfigREST.java`, `PrivateConfigREST.java`, `PublicConfigREST.java`)
+- **Behavior:** `ConfigurationFacade` resolves values via `ConsulFacade` first, falling back to `FileSystemConfigFacade` when Consul is not reachable
+
+---
+
 ## CI / Deployment
 
 ### CI Pipeline
@@ -177,7 +204,7 @@ Used extensively throughout the codebase for:
 
 - Liquibase CLI (external tool, not Maven-managed)
 - Run via `configS.bat` at project root
-- Connects to `localhost:3306/public_trnavavuc` with the WildFly-bundled MySQL connector (`mysql-connector-java-8.0.22.jar`)
+- Connects to `localhost:3306/psk` with the WildFly-bundled MySQL connector (`mysql-connector-java-8.0.22.jar`)
 
 ### Containerisation
 
@@ -195,11 +222,10 @@ Used extensively throughout the codebase for:
 
 **Additional config stored in DB (`Setting` entity):**
 - SMTP settings (host, port, credentials)
-- OIDC settings (ClientId, ClientSecret, TenantId, BaseURL)
 - UVO / EKS API endpoints and credentials
 
 **Secrets location:**
-- OIDC client secrets and SMTP passwords stored in the MySQL `Setting` table (runtime)
+- SMTP passwords stored in the MySQL `Setting` table (runtime)
 - SAML keystores: `publicERANET-server/src/main/resources/META-INF/alice2.jks` (test) and `prod.jks` (production) — committed to repo
 - Aspose license: `publicERANET-server/src/main/resources/META-INF/Aspose.Total.Java.lic` — committed to repo
 

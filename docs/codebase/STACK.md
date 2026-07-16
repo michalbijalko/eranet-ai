@@ -55,7 +55,7 @@ This repo contains two sibling subprojects:
 | `ng-ckeditor` | git `4dee2e10` | Rich-text editor (CKEditor wrapper) |
 | `lodash` | `~4.13.1` | Utility functions |
 | `angular-websocket` | `~2.0.0` | WebSocket service |
-| `angularjs-oauth2` | `~1.2.3` | OAuth2 client flow |
+| `angularjs-oauth2` | `~1.2.3` | Declared but unused — this instance has no OIDC/OAuth2 flow |
 | `cookieconsent2` | `~1.0.10` | GDPR cookie banner |
 | `ngdropzone` | `~1.0.5` | Drag-and-drop file upload |
 | `iframe-resizer` | `~4.3.11` | Cross-origin iframe sizing |
@@ -124,7 +124,7 @@ Scaffolded from `generator-angular 0.8.0` (Yeoman), noted at top of `publicERANE
 ### Build Tool
 
 **Maven** — `publicERANET-server/pom.xml`
-- Group: `sk.innovis`, Artifact: `eranet-server-trnavavuctest`, Version: `1.0-SNAPSHOT`
+- Group: `sk.innovis`, Artifact: `eranet-server`, Version: `1.0-SNAPSHOT`
 - Packaging: **WAR**
 - In-project local repo: `publicERANET-server/lib/` (hosts Aspose commercial JARs)
 - Central repo: `https://repo1.maven.org/maven2`
@@ -133,7 +133,7 @@ Scaffolded from `generator-angular 0.8.0` (Yeoman), noted at top of `publicERANE
 | Plugin | Version | Purpose |
 |--------|---------|---------|
 | `maven-compiler-plugin` | 3.1 | Compile Java 8, run Lombok annotation processing |
-| `maven-war-plugin` | 2.3 | Package WAR, bundle SQL into `WEB-INF/sql/`, set logging profile `trnavavuc_profile` |
+| `maven-war-plugin` | 2.3 | Package WAR, bundle SQL into `WEB-INF/sql/`, set logging profile `eranet_profile` |
 | `maven-dependency-plugin` | 2.6 | Copy endorsed JARs |
 | `eclipselink-staticweave-maven-plugin` | 1.0.3 | EclipseLink static weaving for JPA entities |
 
@@ -143,7 +143,7 @@ Scaffolded from `generator-angular 0.8.0` (Yeoman), noted at top of `publicERANE
 
 ### Application Server
 
-**Target Runtime:** WildFly 26.1.3 (JNDI name pattern `PublicTrnavavucDS` in `persistence.xml`; WildFly path referenced in `configS.bat`)
+**Target Runtime:** WildFly 26.1.3 (JNDI name pattern `EranetDS` in `persistence.xml`; WildFly path referenced in `configS.bat`)
 - Originally also configured for GlassFish (legacy `publicERANET-server/src/main/setup/glassfish-resources.xml`)
 - Application context path: `/webresources` (`@ApplicationPath("webresources")` in `ApplicationConfig.java`)
 
@@ -161,12 +161,12 @@ Scaffolded from `generator-angular 0.8.0` (Yeoman), noted at top of `publicERANE
 
 ### Persistence
 
-**JPA Provider:** EclipseLink `2.6.4` — `publicERANET-server/pom.xml`
-- Persistence unit: `PublicTestPU` (JTA)
-- JTA data source JNDI: `PublicTrnavavucDS`
+**JPA Provider:** EclipseLink `2.7.3` — `publicERANET-server/pom.xml` (the static-weaving plugin pins `2.6.4` separately)
+- Persistence unit: `EranetPU` (JTA)
+- JTA data source JNDI: `EranetDS`
 - Static weaving enabled (`eclipselink.weaving=static`, `eclipselink.target-server=JBoss`)
 - Persistence descriptor: `publicERANET-server/src/main/resources/META-INF/persistence.xml`
-- 130+ entity classes under package `sk.innovis.eranetpublic.server.dto`
+- 268 entity/DTO classes under package `sk.innovis.eranetpublic.server.dto` (269 `<class>` entries registered in persistence.xml)
 
 **Database Schema Migrations:** Liquibase (external CLI, not Maven plugin)
 - Master changelog: `publicERANET-server/src/main/sql/db.changelog-master.xml`
@@ -184,11 +184,10 @@ Scaffolded from `generator-angular 0.8.0` (Yeoman), noted at top of `publicERANE
 
 | Library | Version | Purpose |
 |---------|---------|---------|
-| `nimbus-jose-jwt` | 9.37.3 | JWT parsing/validation |
-| `java-jwt` (auth0) | 3.3.0 | JWT creation |
+| `java-jwt` (auth0) | 3.3.0 | JWT creation (referenced only from `Setting.java`) |
 | `java-saml` (onelogin) | 2.2.0 | SAML 2.0 SP support |
-| `opensaml` | 2.6.4 | SAML low-level library |
-| `eclipselink` | 2.6.4 | JPA ORM |
+| `opensaml` | 2.6.1 | SAML low-level library |
+| `eclipselink` | 2.7.3 | JPA ORM (weaving plugin pins 2.6.4) |
 | `resteasy-jaxrs` | 2.2.1.GA | JAX-RS implementation |
 | `jackson-jaxrs-json-provider` | 2.3.2 | JSON serialisation |
 | `jackson-databind` | 2.4.0 | Object mapping |
@@ -233,7 +232,7 @@ License: `publicERANET-server/src/main/resources/META-INF/Aspose.Total.Java.lic`
 - Build-time config injected into `dist/scripts/config.js` via `grunt-ng-constant` (`publicERANET-client/Gruntfile.js` `ngconstant` task)
 
 **Logging:**
-- Server: WildFly logging profile `trnavavuc_profile` set via `MANIFEST.MF` (`maven-war-plugin` configuration)
+- Server: WildFly logging profile `eranet_profile` set via `MANIFEST.MF` (`maven-war-plugin` configuration)
 
 ---
 
