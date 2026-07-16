@@ -1,4 +1,4 @@
-# Requirements: TTSK / ERANET — Ticket-Driven Development
+# Requirements: PSK / ERANET — Ticket-Driven Development
 
 **Defined:** 2026-06-03
 **Core Value:** Every change traces to exactly one Jira ticket, follows existing patterns, and ships in clean, disciplined commits — without breaking the live procurement platform.

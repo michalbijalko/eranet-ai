@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Stop hook: flag verbose (multi-line) comment blocks added in the working diff.
-# SEAS rule: keep code comments to one line. Self-clearing — once simplified or
+# PSK rule: keep code comments to one line. Self-clearing — once simplified or
 # committed, the diff is clean and this passes.
 set -uo pipefail
 
@@ -47,7 +47,7 @@ flagged="$(printf '%s' "$flagged" | sort -u | sed '/^$/d')"
 
 if [ -n "$flagged" ]; then
 	{
-		echo "Verbose multi-line comment block(s) were added. SEAS rule: keep code comments to one line."
+		echo "Verbose multi-line comment block(s) were added. PSK rule: keep code comments to one line."
 		echo "Simplify them (or run the comment-simplifier agent on the diff). Files:"
 		printf '%s\n' "$flagged" | sed 's/^/  - /'
 	} >&2

@@ -1,6 +1,6 @@
-# Roadmap: TTSK / ERANET — Ticket-Driven Development
+# Roadmap: PSK / ERANET — Ticket-Driven Development
 
-**Project:** TTSK / ERANET — Ticket-Driven Development
+**Project:** PSK / ERANET — Ticket-Driven Development
 **Granularity:** Coarse
 **Mode:** MVP
 **Coverage:** 11/11 requirements mapped

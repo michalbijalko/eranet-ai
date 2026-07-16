@@ -1,6 +1,6 @@
 ---
 name: documentation
-description: How we produce project documentation for TTSK - generated alongside the feature into docs/ or Nuklino, not as an afterthought. Use whenever writing or generating docs, READMEs, technical/architecture/API/setup documentation, or when the user mentions "dokumentácia", "zdokumentuj", "docs", "Nuklino". Text is what AI does best - generate docs as part of delivery.
+description: How we produce project documentation for PSK - generated alongside the feature into docs/ or Nuklino, not as an afterthought. Use whenever writing or generating docs, READMEs, technical/architecture/API/setup documentation, or when the user mentions "dokumentácia", "zdokumentuj", "docs", "Nuklino". Text is what AI does best - generate docs as part of delivery.
 ---
 
 # Documentation

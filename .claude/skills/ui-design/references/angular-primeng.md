@@ -1,6 +1,6 @@
 # AngularJS Bootstrap (ui.bootstrap) — Quick Reference
 
-TTSK uses AngularJS 1.5 + Bootstrap 3 + SmartAdmin + `ui.bootstrap` v1.3.3.
+PSK uses AngularJS 1.5 + Bootstrap 3 + SmartAdmin + `ui.bootstrap` v1.3.3.
 When uncertain about a directive, look at existing usage in `publicERANET-client/app/views/` first.
 
 ## Key directives
