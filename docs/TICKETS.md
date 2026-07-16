@@ -29,6 +29,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 | Požiadavky IO/VO: rename attribute to "Obsahuje limitované informácie" | EP-13136 | EP-13159 |
 | Požiadavky IO/VO: new attribute "Stupeň dôvernosti" | EP-13137 | EP-13161 |
 | Zákazky: Interný postup — default §34 participation condition (enabled + pre-filled) | EP-13251 | EP-13252 |
+| Požiadavky IO/VO: sequential presentation numbering of attributes ("1. Názov") | EP-13248 | EP-13249 |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
