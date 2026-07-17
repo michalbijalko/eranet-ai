@@ -24,6 +24,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 | Feature | Story | Dev |
 |---|---|---|
 | Analýza rozdielov v module Externé požiadavky OvZP — CPSTT a CP PSK | EP-13257 | EP-13259 |
+| Merge úprav na trnavavuc-test — Externé požiadavky OvZP (1. dávka) | EP-13263 | EP-13264 |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
