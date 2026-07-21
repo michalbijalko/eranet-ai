@@ -23,18 +23,23 @@ module**; e-mail content and format unchanged.
    receives the e-mail.
 4. **Module guard** — resolve the tender via `MessageToProcurement`; no tender ⇒ skip.
    Excludes the qualification-system path.
-5. **Setting storage** — `confident = true` (hidden from suppliers); default treated as OFF
-   when the row is absent or `"false"`.
+5. **Setting storage** — `confident` left `NULL` (matching every existing setting, incl. the
+   analogous `ProcurementAnnouncementNotification`); default treated as OFF when the row is
+   absent or `"false"`. Not confident so the standard `getByNameInternal` read returns it in
+   every context — including a supplier sender — which is required by AC #4.
 
 ## Backend
 
 **File:** `publicERANET-server/.../service/MessageService.java`
 (+ constant in `dto/Setting.java`).
 
-**Setting.** New name/value row in the `setting` table. Constant:
+**Setting.** New name/value row in the `setting` table, seeded via Liquibase with `value
+= 'false'` and `confident` left `NULL` (omit the column, per existing convention). Constant:
 `SETTING_NAME_PROCUREMENT_RESPONSIBLE_PERSON_COMMUNICATION_NOTIFICATION =
 "ProcurementResponsiblePersonCommunicationNotification"`. Read with
-`settingService.getByNameInternal(name)`; enabled when `"true".equals(getValue())`.
+`settingService.getByNameInternal(name)`; enabled when `"true".equals(getValue())`. Because
+the row is not confident, this read returns the value regardless of the sender's role (a
+supplier can be the sender — AC #4), so no role-independent read variant is needed.
 
 **Logic in `getEmailsAndSendNotification(Message message)` (~`MessageService.java:874`),
 applied after the existing recipient-ID set is built and before the `findAll`:**
