@@ -31,6 +31,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 | Message tags: role/context logic | `EP-13103` | `EP-13189` |
 | Observer can reply to message (tag reconcile fix) | `EP-13103` | `EP-13229` |
 | Reply/forward: show copied message tags | `EP-13103` | `EP-13222` |
+| Comms notification to all responsible persons | `EP-13278` | `EP-13279` |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
