@@ -15,6 +15,10 @@ whether we **close + commit** the ticket or **do fixes**.
 
 ## When to run
 
+**Precondition (hard gate):** do not generate the checklist until the code-reviewer agents have
+run and returned clean. If they haven't, run them first — code review always precedes manual
+testing and commit.
+
 After the executors + code reviewers are clean, and **before** the manual browser smoke test.
 Workflow position: brainstorm → planner → executor → code-reviewer → **this skill** → user tests
 in the app → (all pass ⇒ commit) / (any fail ⇒ fix & re-check).
