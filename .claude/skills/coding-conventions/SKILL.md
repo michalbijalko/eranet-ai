@@ -201,6 +201,10 @@ public class ExampleEntity implements Serializable, HasId {
 
 - **Schema changes** (CREATE TABLE, ALTER TABLE, etc.) → Liquibase changeset in `publicERANET-server/src/main/sql/`.
 - **Data inserts** → raw SQL scripts only.
+- **System settings (`setting` table).** Seed new rows with `confident` NULL (omit the
+  column), like every existing row. `confident=true` hides the row from suppliers via
+  `SettingService.findAllInternal`, so a `getByNameInternal` read in a supplier's request
+  context returns null and silently disables the feature for supplier-initiated flows.
 - Changeset author: **`m.bijalko`** always.
 - Apply migrations with `configS.bat` before starting WildFly.
 - `configS.bat` is gitignored and holds DB credentials — never `git rm` it (that deletes the
