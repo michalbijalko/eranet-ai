@@ -4,3 +4,6 @@ publicERANET-server/
 
 # Local dev config scripts — contain machine-specific paths and DB credentials
 config*.bat
+
+# Office lock files created while a document is open
+~$*
