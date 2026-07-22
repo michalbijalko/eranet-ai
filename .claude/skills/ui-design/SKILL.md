@@ -44,7 +44,11 @@ Do not introduce a new component library or redesign. Reuse what is already here
   classes ≠ identical result.
 - **Localization.** All user-visible text must use `{{ 'TRANSLATION_KEY' | translate }}`
   via `angular-translate`. Translation keys in English; Slovak values in
-  `publicERANET-client/app/i18n/sk.json`.
+  `publicERANET-client/app/scripts.no.min/langs/sk.js` (English in `en.js`, same folder).
+- **Info tooltips.** Use the custom `data-tooltip` attribute directive
+  (`scripts/directives/tooltip.js`), not `uib-tooltip` — only `data-tooltip` gets the blue
+  `i[data-tooltip].fa-info` styling. Tooltip text renders under `.tooltip-inner { white-space: pre }`,
+  so wrap long text with `\n`, not `<br>` (the directive doesn't honor `data-html`).
 - **Date and number formatting.** Use the existing filters (e.g.,
   `harmonogramTaskStatusFilter`, `undefinedNumberFilter`) or `$filter('date')` with Slovak
   locale settings. Do not hardcode date format strings.
