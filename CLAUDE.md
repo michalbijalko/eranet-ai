@@ -24,6 +24,7 @@ These rules are mandatory for **all** code work on VSE/ERANET. They exist becaus
 - **One ticket per commit** — never mix multiple tickets.
 - Simple, human-readable messages and comments — no phase numbers or internal codes.
 - **Confirm before committing.** Make the change and let the user verify it works (in the running app for UI/behaviour changes) before committing — don't commit a fix proactively.
+- **Never rewrite a pushed or deployed commit.** Don't `amend`, rebase, or force-push a commit that already exists on the remote or has been deployed — put any follow-up change in a **new commit on top**.
 - Example: `feat(EP-12688, EP-12689): add contract type enum to procurement form`
 
 ### 3. Language — English-only (CRITICAL)
