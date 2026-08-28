@@ -35,6 +35,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 | Confirmation datetime column in English auction | `EP-13297` | `EP-13298` |
 | Predefined auction invitation text | `EP-13300` | `EP-13301` |
 | Login page: SSO button rename and layout | `EP-13378` | `EP-13379` |
+| Negative values in supplier numeric criterion | `EP-13570` | `EP-13572` |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
