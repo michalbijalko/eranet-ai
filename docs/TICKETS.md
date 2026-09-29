@@ -38,6 +38,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 | Negative values in supplier numeric criterion | `EP-13570` | `EP-13572` |
 | Communication protocol generation timeout | `EP-13632` | `EP-13634` |
 | Message detail loads slowly for superadmin (single-ticket commit, no Dev sub-task) | `EP-13636` | — |
+| Print of message in communication shows no content (single-ticket commit, no Dev sub-task) | `EP-13639` | — |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
