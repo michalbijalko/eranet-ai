@@ -35,6 +35,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 | Požiadavky IO: Core/noncore form editable only by the author before sending | EP-13602 | EP-13608 |
 | Požiadavky IO: Core/noncore form questions and answers in the PDF protocol | EP-13603 | EP-13610 |
 | Požiadavky IO: copy of an old request does not take over the manual Core/noncore value (bug) | EP-13601 | EP-13646 |
+| Požiadavky IO: copy of a request resets the filled Core/noncore formular (bug) | EP-13602 | EP-13647 |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
