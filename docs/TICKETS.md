@@ -10,6 +10,8 @@ Look up the correct pair here **before every code commit**. Referenced from `CLA
 - Format: `feat|fix(STORY, DEV): description`
   - **Story ticket first**, **Dev ticket second**.
   - **Never** put the Epic in the first slot.
+  - A bug with no parent Story is committed alone: `fix(EP-XXXX): description` (no pair, no row here).
+  - A Bug Sub-task under a Story: parent Story first, the bug second; add its row below.
 - One ticket's work per commit — never mix tickets.
 - Simple, human-readable messages — no phase numbers or internal codes.
 

@@ -39,6 +39,8 @@ feat|fix(STORY, DEV): short human-readable description
 
 - **Story ticket first**, Dev ticket second.
 - **Never** put the Epic in the first slot.
+- A **bug with no parent Story** is committed on its own as `fix(EP-XXXX): description` (single ticket, no pair, no `TICKETS.md` row).
+- A **Bug Sub-task under a Story** uses the parent Story first and the bug second, e.g. `fix(EP-13601, EP-13646)`; add its row to `docs/TICKETS.md` without asking.
 - One commit per ticket — never mix multiple tickets.
 - Simple, human-readable messages: no phase numbers, no internal codes.
 
