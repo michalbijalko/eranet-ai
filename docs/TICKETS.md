@@ -39,6 +39,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 | Communication protocol generation timeout | `EP-13632` | `EP-13634` |
 | Message detail loads slowly for superadmin (single-ticket commit, no Dev sub-task) | `EP-13636` | — |
 | Print of message in communication shows no content (single-ticket commit, no Dev sub-task) | `EP-13639` | — |
+| Statistics: confidentiality agreement attribute reads the NDA checkbox (single-ticket commit, no Dev sub-task) | `EP-13663` | — |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
