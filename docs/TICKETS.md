@@ -27,6 +27,7 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 | Merge úprav na trnavavuc-test — Externé požiadavky OvZP (všetky dávky) | EP-13263 | EP-13264 |
 | WOPI — oprava otvárania príloh v online editore Office 365 (bug) | EP-13620 | — (bug ticket, bez páru) |
 | Externé požiadavky – Konfig: pozorovateľ vidí tlačidlo „Vykonať FK" | EP-13354 | EP-13618 |
+| Požiadavky CPS – Rozšírené vyhľadávanie (popup „Rozšírený filter") | EP-13665 | EP-13666 |
 
 <!-- Add a row per ticket pair as work arrives. -->
 
