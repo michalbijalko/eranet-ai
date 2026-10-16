@@ -1,3 +1,7 @@
 # Nested application repositories (cloned separately, each has its own git)
 publicERANET-client/
 publicERANET-server/
+
+# Local Liquibase runners (machine-specific paths and DB credentials)
+configS.bat
+configR.bat
