@@ -1,8 +1,8 @@
 ## Project
 
-**SEAS / ERANET — Ticket-Driven Development**
+**ZSD / ERANET — Ticket-Driven Development**
 
-SEAS (ERANET Public) is a production Slovak public-procurement (e-tender) platform: a Java EE 7 REST/WebSocket backend (`publicERANET-server`) and an AngularJS 1.x SPA (`publicERANET-client`), backed by MySQL. This is not a rewrite — it is an **ongoing, Jira-ticket-driven stream of new features and bug fixes** on the existing system, governed by a strict set of engineering conventions so that changes stay consistent, traceable, and faithful to the existing codebase.
+ZSD (ERANET Public) is a production Slovak public-procurement (e-tender) platform: a Java EE 7 REST/WebSocket backend (`publicERANET-server`) and an AngularJS 1.x SPA (`publicERANET-client`), backed by MySQL. This is not a rewrite — it is an **ongoing, Jira-ticket-driven stream of new features and bug fixes** on the existing system, governed by a strict set of engineering conventions so that changes stay consistent, traceable, and faithful to the existing codebase.
 
 **Core Value:** Every change traces to exactly one Jira ticket, follows the existing codebase patterns, and is delivered in clean, disciplined commits — without breaking the live procurement platform. If everything else is negotiable, **this discipline is not**.
 
@@ -10,7 +10,7 @@ SEAS (ERANET Public) is a production Slovak public-procurement (e-tender) platfo
 
 ## Engineering Working Agreement (READ FIRST)
 
-These rules are mandatory for **all** code work on SEAS/ERANET. They exist because AI-assisted changes on a prior project caused real problems (bad commit attribution, mixed tickets, Slovak leaking into code, invented UI, ignored patterns).
+These rules are mandatory for **all** code work on ZSD/ERANET. They exist because AI-assisted changes on a prior project caused real problems (bad commit attribution, mixed tickets, Slovak leaking into code, invented UI, ignored patterns).
 
 **Brainstorm before code.** No implementation or commits for a new feature or behavior change until intent and approach are brainstormed with the user — even when it "looks like a one-liner". Use `superpowers:brainstorming`.
 
@@ -60,7 +60,7 @@ Detailed documentation lives in [`docs/codebase/`](docs/codebase/). Read the rel
 - [`CONVENTIONS.md`](docs/codebase/CONVENTIONS.md) — JavaScript (client) and Java (server) coding conventions, naming patterns, and code-style rules.
 - [`ARCHITECTURE.md`](docs/codebase/ARCHITECTURE.md) — component responsibilities, layers, data flow, key abstractions, entry points, and architectural constraints.
 - [`STRUCTURE.md`](docs/codebase/STRUCTURE.md) — directory and module layout.
-- [`INTEGRATIONS.md`](docs/codebase/INTEGRATIONS.md) — external integrations (SAML/SSO, OIDC, email, document generation).
+- [`INTEGRATIONS.md`](docs/codebase/INTEGRATIONS.md) — external integrations (token auth, SAML/SSO, connectors, email, document generation).
 - [`TESTING.md`](docs/codebase/TESTING.md) — test setup and conventions.
 - [`CONCERNS.md`](docs/codebase/CONCERNS.md) — known issues and cross-cutting concerns.
 
@@ -86,16 +86,16 @@ The **superpowers** plugin provides structured workflows that improve quality on
 
 ### Project Skills (`.claude/skills/`)
 
-These skills encode SEAS-specific rules for each activity. **Read the relevant skill before acting** — they are more detailed than the summaries below.
+These skills encode ZSD-specific rules for each activity. **Read the relevant skill before acting** — they are more detailed than the summaries below.
 
 | Skill | Trigger | Purpose |
 |-------|---------|---------|
 | `issue-tracking` | Starting any ticket | Read Jira ticket via Atlassian MCP; look up Story→Dev pair in `docs/TICKETS.md`; write correct commit message |
 | `app-foundation` | Adding a new Java service or AngularJS screen | Layer setup checklist — EJB, DAO, route, Gruntfile registration |
 | `coding-conventions` | Writing or editing any code | Java EE 7 and AngularJS 1.5 ES5 patterns, naming, array DI, BaseService/BaseDao layering |
-| `code-review` | Reviewing a diff or PR | SEAS-specific review checklist: ticket trace, conventions, layer discipline, security, Liquibase, English-only identifiers |
-| `security` | Adding endpoints, handling credentials, integrating external systems | `@RolesAllowed`, no secrets in code, server-side-only external calls, input sanitization |
-| `authentication` | Touching login flows, session handling, SSO, protected endpoints | Local / SAML 2.0 (ÚPVS) / OIDC — which service to extend, what not to touch |
+| `code-review` | Reviewing a diff or PR | ZSD-specific review checklist: ticket trace, conventions, layer discipline, security, Liquibase, English-only identifiers |
+| `security` | Adding endpoints, handling credentials, integrating external systems | `@OauthSecured` + method-level role annotations, no secrets in code, server-side-only external calls, input sanitization |
+| `authentication` | Touching login flows, session handling, SSO, protected endpoints | JWT bearer token / SAML 2.0 (ÚPVS) — which filter or service to extend, what not to touch |
 | `ui-design` | Building or restyling any UI | Bootstrap 3 + SmartAdmin + `ui.bootstrap` — reuse existing components, no new libs, localization rules |
 | `testing` | Writing tests or verifying a change | Karma/Jasmine client tests; browser smoke testing; critical flows to always check |
 | `acceptance-test-checklist` | Right before manually testing a finished ticket | Generate an in-session clickable Slovak test checklist from the ticket's acceptance criteria (Pass/Fail per step); results drive close+commit or fixes |
@@ -108,7 +108,7 @@ These skills encode SEAS-specific rules for each activity. **Read the relevant s
 
 ## Agents (`.claude/agents/`)
 
-Project-specific subagents that encode the SEAS workflow. Each loads the relevant skills above (and `superpowers:*`) itself. Delegate to them via the `Agent` tool; the typical flow is **brainstorm (with the user) → planner → executor → code-reviewer**.
+Project-specific subagents that encode the ZSD workflow. Each loads the relevant skills above (and `superpowers:*`) itself. Delegate to them via the `Agent` tool; the typical flow is **brainstorm (with the user) → planner → executor → code-reviewer**.
 
 | Agent | When to use | Tools | Loads |
 |-------|-------------|-------|-------|

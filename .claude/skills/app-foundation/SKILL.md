@@ -1,19 +1,19 @@
 ---
 name: app-foundation
-description: What every new module or feature area in SEAS needs before feature work begins - correct layer setup, dev environment running, migrations in place, and existing patterns followed. Use whenever adding a new Java service, a new AngularJS screen area, or setting up a fresh dev environment. Apply early; these are prerequisites, not features.
+description: What every new module or feature area in ZSD needs before feature work begins - correct layer setup, dev environment running, migrations in place, and existing patterns followed. Use whenever adding a new Java service, a new AngularJS screen area, or setting up a fresh dev environment. Apply early; these are prerequisites, not features.
 ---
 
-# Module / feature foundation (SEAS)
+# Module / feature foundation (ZSD)
 
-SEAS is a brownfield system. We extend it ticket by ticket — no new frameworks or rewrites.
+ZSD is a brownfield system. We extend it ticket by ticket — no new frameworks or rewrites.
 Before touching code, ensure the following are in place.
 
 ## Dev environment checklist
 
-1. **WildFly 26.1.3 running** — WAR deployed at context root `/public` (or as configured).
-2. **MySQL containers up** — `docker compose up -d` in `publicERANET-server/` starts both:
+1. **WildFly 11.0.0 running** — WAR deployed at context root `/public_zsd`.
+2. **MySQL up** — the local MySQL on `localhost:3306` with database `zsd-wildfly` (what `configS.bat` targets), or `docker compose up -d` in `publicERANET-server/`, which starts:
    - `eranet_mysql` on port 3307 (application DB)
-   - `jackrabbit_mysql` on port 3308 (JCR/document store)
+   - `jackrabbit_mysql` on port 3308 (defined but unused — no code references JCR)
 3. **Liquibase migrations applied** — run `configS.bat` from project root before first boot and after pulling new changelog files. Schema must match the running code.
 4. **Aspose license present** — `publicERANET-server/src/main/resources/META-INF/Aspose.Total.Java.lic` must exist at startup; it is committed to the repo.
 5. **Client dependencies installed** — in `publicERANET-client/`: `npm install` then `bower install`. Run `grunt serve` for the dev server on port 9000.
@@ -24,7 +24,7 @@ Before touching code, ensure the following are in place.
 - Create a matching `YourEntityDao` that extends `BaseDao<YourEntity>` — never call `EntityManager` directly in a service.
 - Add `@Path`, `@Produces(MediaType.APPLICATION_JSON)`, `@Consumes(MediaType.APPLICATION_JSON)` to the service class.
 - Register the new service class in `ApplicationConfig.java` (`getClasses()` set).
-- Apply `@RolesAllowed(SystemUserGroup.ROLE_NAME_USER)` to the class; use `@PermitAll` only for genuinely public endpoints.
+- Add `@OauthSecured` to the class and a method-level `@ProcurerRoleAllowed` / `@SupplierRoleAllowed` / `@AdministratorRoleAllowed` on each endpoint (see `security`); use `@PermitAll` only for genuinely public endpoints.
 - Register every new `@Entity` in `persistence.xml` (`<class>…</class>`). A successful Maven build is NOT enough — an unlisted entity only fails at deploy (EclipseLink "uses a non-entity … as target entity" at WildFly startup).
 
 ## Adding a new AngularJS screen

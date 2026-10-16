@@ -1,6 +1,6 @@
 ---
 name: coding-conventions
-description: SEAS codebase conventions - JavaScript (AngularJS 1.5 ES5) and Java (Java EE 7). Use whenever writing, editing, refactoring, or reviewing code. Apply so generated code fits the existing codebase and reads as if written by the team.
+description: ZSD codebase conventions - JavaScript (AngularJS 1.5 ES5) and Java (Java EE 7). Use whenever writing, editing, refactoring, or reviewing code. Apply so generated code fits the existing codebase and reads as if written by the team.
 ---
 
 # Coding conventions
@@ -135,7 +135,7 @@ at JDK 8 (e.g. `jdk1.8.0_351`). Base package: `sk.innovis.eranetpublic.server`.
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Stateless
-@RolesAllowed(SystemUserGroup.ROLE_NAME_USER)
+@OauthSecured
 public class ExampleService extends BaseService<ExampleEntity> {
 
     @EJB
@@ -143,6 +143,7 @@ public class ExampleService extends BaseService<ExampleEntity> {
 
     @GET
     @Path("{id}")
+    @ProcurerRoleAllowed
     public ExampleEntity getExample(@PathParam("id") Integer id) {
         return exampleDao.find(id);
     }
@@ -181,7 +182,7 @@ public class ExampleEntity implements Serializable, HasId {
 ```
 
 - `@Transient` for computed fields not persisted to DB.
-- Lombok `@Data` / `@Getter` / `@Setter` acceptable for new or helper classes.
+- Lombok is not in the pom; write getters and setters explicitly.
 
 ### Error handling (server)
 

@@ -1,4 +1,4 @@
-# Project State: SEAS / ERANET — Ticket-Driven Development
+# Project State: ZSD / ERANET — Ticket-Driven Development
 
 *Last updated: 2026-06-03*
 

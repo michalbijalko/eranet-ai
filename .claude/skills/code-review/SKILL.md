@@ -1,12 +1,12 @@
 ---
 name: code-review
-description: SEAS team checklist for reviewing code changes before they ship. Use when reviewing a diff, a PR, or just-written code, or when the user asks to "review", "skontroluj", "prejdi zmeny". Run on changed code, not the whole codebase.
+description: ZSD team checklist for reviewing code changes before they ship. Use when reviewing a diff, a PR, or just-written code, or when the user asks to "review", "skontroluj", "prejdi zmeny". Run on changed code, not the whole codebase.
 disable-model-invocation: false
 ---
 
 # Code review
 
-Review the change against SEAS standards. Focus on team-specific concerns.
+Review the change against ZSD standards. Focus on team-specific concerns.
 
 ## Checklist
 
@@ -21,7 +21,7 @@ Review the change against SEAS standards. Focus on team-specific concerns.
 - **No duplication** — nothing re-implements an existing service, DAO, directive, or
   resource; no accidental copies of existing functionality.
 - **Scope** — only what the ticket asked for; no stray extra functionality.
-- **Security** — `@RolesAllowed` applied correctly (see `security` skill); no secrets in
+- **Security** — `@OauthSecured` on the class and a method-level role annotation on each endpoint (see `security` skill); no secrets in
   code or logs; external service calls go server-side only.
 - **Database changes** — schema changes use Liquibase changesets (author `m.bijalko`), not
   raw DDL. Raw SQL only for INSERT data. New changesets added to the changelog master.
@@ -33,7 +33,7 @@ Review the change against SEAS standards. Focus on team-specific concerns.
 ## Always also check
 
 - **No leaked secrets** — no passwords, API keys, SAML keystores passphrases, or SMTP
-  credentials in the diff. (OIDC/SMTP config lives in the `Setting` DB table; SAML
+  credentials in the diff. (token secrets and SMTP config live in WildFly JNDI, connector credentials in the `Setting` DB table; SAML
   keystores are committed but their passphrases must not be.)
 - **Localization** — user-facing text uses translation keys (English key names) with Slovak
   values in `app/i18n/sk.json`; not hardcoded strings in controllers or templates.

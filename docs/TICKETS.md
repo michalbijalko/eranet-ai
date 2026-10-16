@@ -23,23 +23,6 @@ fix(EP-13001, EP-13002): correct supplier qualification date validation
 
 | Feature | Story | Dev |
 |---|---|---|
-| Fulltext search in message body | `EP-13104` | `EP-13114` |
-| CKEditor in communication | `EP-13100` | `EP-13108` |
-| Tags ("Štítky") in communication | `EP-13103` | `EP-13112` |
-| Old-message formatting fix after CKEditor | `EP-13100` | `EP-13187` |
-| Supplier view: hide message tags | `EP-13103` | `EP-13188` |
-| Message tags: role/context logic | `EP-13103` | `EP-13189` |
-| Observer can reply to message (tag reconcile fix) | `EP-13103` | `EP-13229` |
-| Reply/forward: show copied message tags | `EP-13103` | `EP-13222` |
-| Comms notification to all responsible persons | `EP-13278` | `EP-13279` |
-| Confirmation datetime column in English auction | `EP-13297` | `EP-13298` |
-| Predefined auction invitation text | `EP-13300` | `EP-13301` |
-| Login page: SSO button rename and layout | `EP-13378` | `EP-13379` |
-| Negative values in supplier numeric criterion | `EP-13570` | `EP-13572` |
-| Communication protocol generation timeout | `EP-13632` | `EP-13634` |
-| Message detail loads slowly for superadmin (single-ticket commit, no Dev sub-task) | `EP-13636` | — |
-| Print of message in communication shows no content (single-ticket commit, no Dev sub-task) | `EP-13639` | — |
-| Statistics: confidentiality agreement attribute reads the NDA checkbox (single-ticket commit, no Dev sub-task) | `EP-13663` | — |
 
 <!-- Add a row per ticket pair as work arrives. -->
 

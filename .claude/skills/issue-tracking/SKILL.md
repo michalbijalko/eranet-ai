@@ -8,7 +8,7 @@ description: How we track work in Jira (EP project) - reading tickets before cod
 **Project key:** `EP` (e.g., `EP-12688`)
 
 Every code change traces to exactly one Jira ticket. This is not optional — it is the
-core discipline of SEAS development.
+core discipline of ZSD development.
 
 ## Before writing any code
 
@@ -54,16 +54,16 @@ If the pair is missing from the table, add a row before committing.
 ## Where commits go — three separate repos
 
 The workspace is **three independent Git repos**, not one:
-- `publicERANET-server/` — server code (branch `seas-test`)
-- `publicERANET-client/` — client code (branch `seas-test`)
-- the workspace root (umbrella) — `CLAUDE.md`, `docs/`, `.claude/` (branch `master`)
+- `publicERANET-server/` — server code (branch `zsd_wildfly`)
+- `publicERANET-client/` — client code (branch `zsd_wildfly`)
+- the workspace root (umbrella) — `CLAUDE.md`, `docs/`, `.claude/` (the instance branch, `zsd`)
 
 - Commit code in the repo it lives in. One ticket touching both sides → **one commit per
   repo**, same `feat|fix(STORY, DEV)` message.
 - **Confirm the checked-out branch before committing.** Epic feature work lands on a shared
   `feat/EP-XXXX` branch checked out in *both* nested repos (e.g. `feat/EP-13132`), one commit
-  per story; the umbrella sits on the current client-instance branch (e.g. `seps`), not always
-  `master`/`sepsas_test`.
+  per story; the umbrella sits on the current client-instance branch (e.g. `zsd`), not always
+  `master`.
 - The umbrella repo often holds unrelated staged/untracked changes. **Scope every umbrella
   commit to its files** (`git commit -- <path>`) so you don't sweep up in-flight work.
 - Never `git add` the `publicERANET-*` directories from the umbrella — they are nested repos
