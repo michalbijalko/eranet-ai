@@ -1,6 +1,6 @@
 # Coding Conventions
 
-**Analysis Date:** 2026-06-03
+**Analysis Date:** 2026-10-16
 
 ## Overview
 
@@ -37,7 +37,7 @@ Key JSHint rules in force:
 - Indent size: 4
 - End of line: LF
 - Charset: UTF-8
-- `*.js` files: single quotes
+- (`.editorconfig` only defines `[*]` and `[*.md]` sections; single quotes are a JSHint rule, not an EditorConfig one)
 
 ### Naming Patterns (JS)
 
@@ -52,7 +52,7 @@ Key JSHint rules in force:
 - Factory/service functions: `PascalCase` without suffix for resources (e.g., `ProcurementsResource`), PascalCase for business services (e.g., `Procurements`, `Alerts`, `Utils`)
 - Directive names: camelCase matching their HTML attribute/element name (e.g., `datetimeCell`, `decimalInput`, `attachmentsCell`)
 - Filter functions: `camelCase` with `Filter` suffix (e.g., `harmonogramTaskStatusFilter`, `undefinedNumberFilter`)
-- Constants: `SCREAMING_SNAKE_CASE` for values inside `.constant()` objects (e.g., `FILTER_NAME_CODEBOOK`, `COMPANY_TYPE_SUPPLIER`)
+- Constants: `SCREAMING_SNAKE_CASE` for values inside `.constant()` objects (e.g., `FILTER_NAME_CODEBOOK` in `Constants`, `COMPANY_TYPE_SUPPLIER` in `Codebook`)
 - Module-level variables: camelCase (e.g., `serviceResult`, `procurementsResult`)
 
 **Variables:**
@@ -74,7 +74,7 @@ angular.module('filters', []);
 angular.module('services', []);
 ```
 
-All controllers belong to the `controllers` module, all Angular services/factories to `services`, all directives to `directives`, and all filters to `filters`. `app.main` is used for SmartAdmin theme directives and the `ribbon` factory.
+Controllers belong to the `controllers` module, services/factories to `services`, directives to `directives`, and filters to `filters`. Exceptions: `WebStorage` is registered on `controllers`, and `mainInterceptor`, `htmlCacheInterceptor` and `bearerAuthInterceptor` on `eranetPublic`. `app.main`, `app.localize`, `app.activity` and `app.smartui` (declared in `ng.directives.js`) hold the SmartAdmin theme directives and the `ribbon` factory.
 
 **Route definitions** are in `publicERANET-client/app/scripts/ng.app.js` inside `eranetPublic.config([...])`.
 
@@ -97,7 +97,8 @@ angular.module('controllers')
 
 - First argument to `.controller()` is the `PascalCase` + `Controller` name
 - DI array lists dependencies as strings, matching parameters in the function
-- The constructor function parameter name is typically `define` (not the controller name)
+- The constructor function is often named `define`, but many controllers name it after the controller (e.g., `function LoginController`); follow the file you are editing
+- A few controllers lack the `Controller` suffix (`CommunicationWrapperForDialog`, `ExportFileSettingsDialog`, `QualificationPermissionsCommonView`); use the suffix for new ones
 - `$rootScope` is used frequently for cross-controller shared state (`currentProcurement`, `procurementId`, `currentUser`, etc.)
 - Tab-based views share state via `$controller('TabController', {$scope: $scope})`
 
@@ -130,7 +131,7 @@ angular.module('services').factory('Procurements', ['$resource', '$rootScope', .
 
 ### Resource (REST client) Pattern
 
-Each REST resource is a two-part file:
+Most REST resource files are two-part (about 21 of 116 hold a single factory, and some `*PdfGenerating` files have no `*Resource` factory):
 1. A `$resource` factory named `EntityNameResource` — defines URL templates and custom HTTP methods
 2. A higher-level business factory named `EntityName` — wraps the resource with business logic
 
@@ -140,7 +141,8 @@ angular.module('services').factory('ProcurementsResource', ['$resource',
     function ProcurementsResource($resource) {
         return $resource('webresources/sc/procurement/:procurementId', { procurementId: '@id' }, {
             query: { method: 'POST', url: 'webresources/sc/procurement/query' },
-            updateAttributes: { method: 'PATCH', ... }
+            copy: { method: 'PUT', url: 'webresources/sc/procurement/copy/' },
+            ...
         });
     }
 ]);
@@ -158,7 +160,7 @@ directives.directive('datetimeCell', [function defineDatetimeCell() {
     return {
         restrict: 'E',
         templateUrl: 'views/directives/datetimeCell.html',
-        scope: { array: '=', index: '@', datePropertyName: '@', checkDate: '&' },
+        scope: { array: '=', index: '@', datePropertyName: '@', timePropertyName: '@', blurMethod: '@', disabled: '=' },
         link: function (scope, element, attrs) { ... }
     };
 }]);
@@ -221,13 +223,17 @@ Sub-packages:
 - `service/pdf` — PDF generation services
 - `service/logic` — standalone logic helpers
 - `service/supplier` — supplier-specific service logic
-- `interceptor` — JAX-RS reader interceptors
+- `service/ecm`, `service/jms`, `service/help` — ECM integration, DP-connector services, harmonogram helpers
+- `filter` — JAX-RS filters (`BearerFilter`, `JWTAuthFilter`, `ResponseFilter`)
+- `api` — versioned REST API (`rest`, `dto`, `mapping`)
 - `exception` — JAX-RS `ExceptionMapper` providers
-- `annotation` — custom annotations (e.g., `@PATCH`)
-- `configuration` — CDI/EJB configuration beans
+- `annotation` — `JWTSecured`; the other security annotations (`OauthSecured*`, `KeySecured`, `ProcurerRoleAllowed`, `SupplierRoleAllowed`, `AdministratorRoleAllowed`) sit in the package root
+- `configuration` — plain config POJOs filled from JNDI by `ConfigurationService`
 - `saml` / `sso` — SAML/SSO authentication code
 - `serialization` — serialization DTOs for external integrations
 - `ws` — WebSocket endpoints
+
+Two further source roots hold generated or connector code: `dperanet/` (DP connector DTOs) and `ixtent/` (generated xECM JAX-WS client).
 
 ### Naming Patterns (Java)
 
@@ -250,14 +256,15 @@ Sub-packages:
 ### Service/DAO Pattern
 
 **BaseService** (`publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/BaseService.java`):
-- Abstract generic class `BaseService<T>` extended by all concrete services
-- Injects `Logger` via CDI `@Inject`
+- Abstract generic class `BaseService<T>` extended by most concrete services (128 of 146)
+- Injects `Logger` via CDI `@Inject` (`LoggerProducer`)
+- Provides `getCurrentUser()` (resolves the token user through `SystemUserService.findByLogin`)
 - Injects EJB collaborators via `@EJB`
 - Provides shared date format constants (`STANDARD_DATE_FORMAT`, `FULL_DATETIME_FORMAT`, etc.)
 
 **BaseDao** (`publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/BaseDao.java`):
-- Abstract generic class `BaseDao<T>` extended by all concrete DAOs
-- Injects `EntityManager` via `@PersistenceContext(name = "PublicPU")`
+- Abstract generic class `BaseDao<T>` extended by 114 of the 115 DAOs
+- Injects `EntityManager` via `@PersistenceContext(name = "PublicPU")` (an ENC name; the unit itself is `PublicTestZsdPU`)
 - Provides `create`, `find`, `update`, `delete` operations using JPA Criteria API
 
 **Concrete service example:**
@@ -267,7 +274,8 @@ Sub-packages:
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Stateless
-@RolesAllowed(SystemUserGroup.ROLE_NAME_USER)
+@OauthSecured
+@ProcurerRoleAllowed
 public class ProcurementService extends BaseService<Procurement> { ... }
 ```
 
@@ -298,23 +306,24 @@ public class Addendum implements Serializable, HasAttachment, HasId {
 - Implement `Serializable`
 - `@Transient` fields used for computed or helper data sent to client
 - Public constant strings for property names (e.g., `AGREEMENT_ID_PROPERTY_NAME`, `FILE_REFERENCED_TYPE_NAME`)
-- Lombok `@Data`/`@Getter`/`@Setter` used in newer or helper classes (Lombok is on the classpath as v1.18.20)
+- No Lombok: getters and setters are written out (Lombok is not in the pom)
 
 ### Annotations
 
 - `@Stateless` — all service EJBs are stateless session beans
-- `@RolesAllowed(SystemUserGroup.ROLE_NAME_USER)` — default role for service classes
-- `@PermitAll` — overrides class-level security for public endpoints
-- `@Path`, `@GET`, `@POST`, `@PUT`, `@DELETE`, `@PATCH` (custom annotation) — JAX-RS HTTP methods
+- `@OauthSecured` — class-level: the endpoint requires a valid bearer token (checked by `BearerFilter`)
+- `@ProcurerRoleAllowed`, `@SupplierRoleAllowed`, `@AdministratorRoleAllowed` — role checks against the token `authorities`; **put them on the method**, because `BearerFilter` does not read them from the class (see CONCERNS.md)
+- `@PermitAll` — marks public endpoints
+- `@KeySecured` / `@OauthSecuredEcm` / `@JWTSecured` — API-key, ECM-token and RSA-JWT gates for connector and `api/v1` endpoints
+- `@Path`, `@GET`, `@POST`, `@PUT`, `@DELETE` — JAX-RS HTTP methods (no `@PATCH`)
 - `@Produces(MediaType.APPLICATION_JSON)` / `@Consumes(MediaType.APPLICATION_JSON)` — JSON in/out
-- `@Provider` — JAX-RS providers (exception mappers, interceptors)
-- Custom `@PATCH` annotation in `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/annotation/PATCH.java` since JAX-RS 2.0 did not include PATCH
+- `@Provider` — JAX-RS providers (exception mappers, filters)
 
 ### Error Handling (Server)
 
 - `AccessLocalException` (EJB security) → mapped to HTTP 403 by `AccessLocalExceptionHandler`
 - Business rule violations → `WebApplicationException` with appropriate `Response.Status`
-- Input sanitization via `FindParametersSanitizer` interceptor (`publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/interceptor/FindParametersSanitizer.java`) which strips forbidden filter fields from `FindParameters` objects
+- There is no central request sanitizer; supplier-scoped filtering is enforced by the `BaseService` helpers `checkIfSupplierFilterPresent` and `checkIfSupplierWorkWithOwnCompany`, and uploaded HTML is cleaned with AntiSamy in `FileService`
 - `logger.warn()` used when forbidden operations are attempted
 
 ### Logging (Server)
@@ -328,8 +337,8 @@ public class Addendum implements Serializable, HasAttachment, HasId {
 
 - In-line comments and block comments in Slovak (matches the application domain language)
 - No Javadoc in service/DAO layer
-- `// TODO:` comments reference Jira tickets (e.g., `//TODO bude sa riesit neskor EP-3908`)
+- `// TODO:` comments are rare (6 in server Java) and carry no Jira key
 
 ---
 
-*Convention analysis: 2026-06-03*
+*Convention analysis: 2026-10-16*

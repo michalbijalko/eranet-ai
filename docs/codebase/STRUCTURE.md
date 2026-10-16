@@ -1,142 +1,158 @@
-<!-- refreshed: 2026-06-03 -->
+<!-- refreshed: 2026-10-16 -->
 # Codebase Structure
 
-**Analysis Date:** 2026-06-03
+**Analysis Date:** 2026-10-16
 
 ## Directory Layout
 
 ```
-seas_test/                        # Workspace root
-├── configS.bat                   # Windows setup script
+zsd-wildfly/                        # Workspace root (umbrella repo, branch `zsd`)
+├── .claude/                      # Project skills, agents, hooks
+├── docs/                         # Project + codebase documentation
+├── CLAUDE.md                     # Engineering working agreement
+├── configS.bat                   # Liquibase `update` against the local DB
+├── configR.bat                   # Liquibase `rollback-count --count=1` against the local DB
 ├── publicERANET-client/          # AngularJS 1.x SPA subproject (Git repo)
 │   ├── app/                      # Deployable SPA root
-│   │   ├── index.html            # Single HTML shell; ng-app bootstrap point
+│   │   ├── index.html            # Single HTML shell; ng-app bootstrap point; registers every app script
 │   │   ├── scripts/              # All JavaScript source
-│   │   │   ├── ng.app.js         # Angular module declaration + $routeProvider config
+│   │   │   ├── ng.app.js         # Angular module declaration + $routeProvider config + run block
 │   │   │   ├── app.js            # SmartAdmin/jQuery shell initialization
 │   │   │   ├── app.config.js     # SmartAdmin global config (throttle, menu speed, etc.)
 │   │   │   ├── config.js         # Angular 'config' module (build timestamp constant)
 │   │   │   ├── filters.js        # Angular filters module
-│   │   │   ├── ng.directives.js  # Core layout/navigation directives
+│   │   │   ├── ng.directives.js  # Core layout/navigation directives (app.main, app.localize, app.smartui, ...)
 │   │   │   ├── bootstrap/        # bootstrap.min.js
 │   │   │   ├── controllers/      # Angular controllers (screen logic)
-│   │   │   ├── directives/       # Angular directives (reusable widgets)
+│   │   │   ├── directives/       # Angular directives (reusable widgets, incl. tableFilters/)
 │   │   │   ├── notification/     # SmartNotification plugin
 │   │   │   ├── plugin/           # Vendored JS plugins (datatables, select2, etc.)
 │   │   │   ├── service/          # Angular services
-│   │   │   │   ├── resources/    # $resource + business service pairs (129 files)
+│   │   │   │   ├── resources/    # $resource + business service pairs (116 files)
 │   │   │   │   └── business/     # Additional business-logic services (3 files)
 │   │   │   └── smartwidgets/     # JarvisWidget code
-│   │   ├── views/                # HTML partial templates (mirror of controllers/)
-│   │   ├── styles/               # Minified CSS (SmartAdmin, Bootstrap, custom)
-│   │   ├── styles.no.min/        # Non-minified CSS source
-│   │   ├── scripts.no.min/       # Non-minified JS: i18n lang files in langs/
-│   │   ├── data/                 # Static data files (PDFs, etc.)
+│   │   ├── views/                # HTML partial templates (mostly mirror controllers/; also directives/, tenders/)
+│   │   ├── styles/               # custom.css, custom.not.min.css and theme CSS
+│   │   ├── styles.no.min/        # *.min.css copies plus external-page.css, loading.css, zse.css
+│   │   ├── scripts.no.min/       # Non-minified JS: langs/ (sk, en, hr), vendored CKEditor 4.6.2, jQuery, select2, registration/forgot-password scripts
+│   │   ├── data/                 # Static files (import templates, PDFs in eranet/ and innovis/)
 │   │   ├── fonts/                # Web fonts
-│   │   ├── images/ img/          # Static image assets
+│   │   ├── images/ img/          # Static image assets (incl. ZSD logos)
 │   │   ├── sound/                # Audio files for notifications
-│   │   └── bower_components/     # Vendored front-end dependencies (IGNORE)
+│   │   └── bower_components/     # Bower-installed dependencies (untracked, IGNORE)
 │   ├── test/
-│   │   └── spec/                 # Karma/Jasmine test specs
-│   ├── Gruntfile.js              # Grunt build configuration (concat, uglify, copy, ngconstant)
+│   │   └── spec/                 # Karma/Jasmine test specs (single stub)
+│   ├── Gruntfile.js              # Grunt build configuration (usemin, concat, uglify, cssmin, copy, ngconstant)
 │   ├── bower.json                # Bower dependency manifest
 │   ├── package.json              # npm/Grunt task dependencies
 │   └── nbproject/                # NetBeans project metadata
 │
 └── publicERANET-server/          # Java EE 7 WAR subproject (Git repo)
-    ├── pom.xml                   # Maven WAR project (groupId: sk.innovis, Java 1.8)
+    ├── pom.xml                   # Maven WAR project (groupId: sk.innovis, artifactId: eranet-server-zsdtest, Java 1.8)
+    ├── docker-compose.yml        # Local MySQL 5.7 container
     ├── src/
     │   ├── main/
     │   │   ├── java/sk/innovis/eranetpublic/server/
-    │   │   │   ├── annotation/       # Custom JAX-RS annotations (PATCH.java)
-    │   │   │   ├── configuration/    # Config beans (OIDC, Mail, Auction)
-    │   │   │   ├── dao/              # JPA DAOs (~128 files + helpDto/)
+    │   │   │   ├── annotation/       # JWTSecured
+    │   │   │   ├── api/              # Versioned REST API (rest/ controllers, dto/, mapping/)
+    │   │   │   ├── configuration/    # Config beans (General, Itender, MailServer, Secrets)
+    │   │   │   ├── dao/              # JPA DAOs (~115 files + helpDto/)
     │   │   │   │   └── helpDto/      # Query helpers: FindParameters, FindResult, etc.
-    │   │   │   ├── dto/              # JPA @Entity classes (~208 files)
+    │   │   │   ├── dto/              # JPA @Entity classes (~185 files)
     │   │   │   │   └── face/         # Interfaces: HasId, HasCopy, IsProcurement
-    │   │   │   ├── exception/        # JAX-RS exception mapper
-    │   │   │   ├── interceptor/      # JAX-RS request interceptors
+    │   │   │   ├── exception/        # AccessLocalExceptionHandler (JAX-RS exception mapper)
+    │   │   │   ├── filter/           # JAX-RS filters: BearerFilter, JWTAuthFilter, ResponseFilter, CustomDynamicFeature
     │   │   │   ├── saml/             # SAML 2.0 client
     │   │   │   ├── serialization/    # Jackson providers, XML adapters
     │   │   │   │   └── dto/          # Serialization-specific DTOs (Proebiz, statistics)
-    │   │   │   ├── service/          # REST+EJB service classes (~166 files)
+    │   │   │   ├── service/          # REST+EJB service classes (~146 files)
     │   │   │   │   ├── comparator/   # Comparator helpers
+    │   │   │   │   ├── ecm/          # ECM integration
     │   │   │   │   ├── enums/        # Shared enums
     │   │   │   │   ├── excel/        # Excel export logic
     │   │   │   │   ├── help/         # Harmonogram interval helper
+    │   │   │   │   ├── jms/          # JMS messaging
     │   │   │   │   ├── logic/        # HTML table builder, file description collector
     │   │   │   │   ├── pdf/          # PDF generation services
     │   │   │   │   └── supplier/     # Supplier-specific services
-    │   │   │   ├── sso/              # UPVS government SSO
-    │   │   │   └── ws/               # WebSocket endpoints
+    │   │   │   ├── sso/              # SSO service + SAML assertion container
+    │   │   │   └── ws/               # WebSocket endpoints (PingEndpoint, RealTimeEndpoint)
+    │   │   │   # package root also holds the security annotations (OauthSecured*, KeySecured,
+    │   │   │   # AdministratorRoleAllowed, ProcurerRoleAllowed, SupplierRoleAllowed), Utils,
+    │   │   │   # PublicConstants and LoggerProducer
     │   │   ├── resources/
     │   │   │   └── META-INF/
-    │   │   │       ├── persistence.xml   # JPA persistence unit config
+    │   │   │       ├── persistence.xml   # JPA persistence unit config (PublicTestZsdPU)
     │   │   │       ├── idp.metadata.xml  # SAML identity provider metadata
     │   │   │       ├── sp.metadata.xml   # SAML service provider metadata
-    │   │   │       └── proebiz_schema.wsdl
+    │   │   │       ├── antisamy-anythinggoes.xml  # AntiSamy XSS sanitizer policy
+    │   │   │       ├── *.jks             # SAML / ECM keystores
+    │   │   │       └── xecm*.wsdl        # ECM web service definitions
     │   │   ├── setup/
     │   │   │   └── glassfish-resources.xml  # JDBC pool + JNDI resource definitions
-    │   │   ├── sql/                  # Versioned DB migration scripts (1.2 → 2.11.0)
+    │   │   ├── sql/                  # Liquibase changelogs (db.changelog-master.xml) + versioned dirs 1.2 → 2.4.0
     │   │   └── webapp/
     │   │       └── WEB-INF/
-    │   │           ├── web.xml           # Servlet 3.0 descriptor, security, session config
+    │   │           ├── web.xml           # Servlet descriptor, security constraint, session config
     │   │           ├── glassfish-web.xml # GlassFish context-root, alternatedocroot
-    │   │           ├── jboss-web.xml     # WildFly/JBoss context-root, security domain
+    │   │           ├── jboss-web.xml     # WildFly/JBoss context-root (/public_zsd)
     │   │           ├── beans.xml         # CDI bean discovery marker
-    │   │           └── antisamy-anythinggoes.xml  # AntiSamy XSS sanitizer config
+    │   │           ├── antisamy-slashdot-1.4.4.xml  # AntiSamy policy (alternative)
+    │   │           └── proebiz_schema.wsdl          # ProEBiz web service definition
     │   └── test/
-    │       └── java/                 # Java test sources (minimal)
-    ├── eranet-domain/                # Git submodule — external domain library
-    │   └── src/main/resources/META-INF/  # Empty (no Java sources active)
-    ├── public-eranet/                # Git submodule — shared service base
-    │   └── src/main/java/...         # Empty (no Java sources active)
+    │       └── java/test/TestWs.java     # Only Java test class
     └── lib/                          # Local Maven repository for Aspose JARs
-        └── com/aspose/               # aspose-words, aspose-pdf, aspose-email, aspose-cells
+        └── com/aspose/
 ```
 
-> **Git topology:** three independent repos — the two subprojects (each on branch `seas-test`) and the workspace-root/umbrella repo holding `docs/`, `.claude/`, `CLAUDE.md` (branch `master`). Code is committed in its subproject repo; docs and guidance in the umbrella. The `publicERANET-*` dirs are nested repos — never add them from the umbrella.
+> **Git topology:** three independent repos — the two subprojects (each on branch `zsd_wildfly`) and the workspace-root/umbrella repo holding `docs/`, `.claude/`, `CLAUDE.md` (branch `zsd`). Code is committed in its subproject repo; docs and guidance in the umbrella. The `publicERANET-*` dirs are nested repos — never add them from the umbrella. There are no Git submodules in the server checkout.
 
 ## Directory Purposes
 
 **`publicERANET-client/app/scripts/controllers/`:**
-- Purpose: AngularJS controllers grouped by functional area
-- Contains: `main.js`, `header.js`, `login.js`, `lang.js`, `ribbon.js`, plus subdirectories:
+- Purpose: AngularJS controllers grouped by functional area (~347 files)
+- Contains: `main.js`, `header.js`, `login.js`, `lang.js`, `ribbon.js` and other top-level files, plus subdirectories:
   - `procurement/` — procurement lifecycle phases (preparation, evaluation, contract, approval, permissions, publishing)
   - `planning/` — internal requests, yearly plans, merge requests
   - `qualification/` — qualification systems, applications, supplier input
-  - `communication/`, `home/`, `buyers/`, `suppliers/`, `statistics/`, `eks/`, `dataRetention/`, `publicLists/`, `publicQualification/`, `supplierSection/`, `companyProfile/`, `personalProfile/`
-- Key files: `publicERANET-client/app/scripts/controllers/main.js` (MainController — session init)
+  - `communication/`, `home/`, `buyers/`, `suppliers/`, `statistics/`, `eks/`, `publicLists/`, `publicQualification/`, `companyProfile/`, `personalProfile/`, `general/`, `include/`, `legislation/`
+- Key files: `publicERANET-client/app/scripts/controllers/main.js` (MainController — session init, SSO redirect, token refresh)
 
 **`publicERANET-client/app/scripts/service/resources/`:**
-- Purpose: One file per domain entity; each exports `XyzResource` ($resource) and `Xyz` (business wrapper)
-- Contains: 129 resource service files matching server entity names (e.g., `procurements.js`, `companies.js`, `agreements.js`, `applications.js`)
+- Purpose: One file per domain entity; most export `XyzResource` ($resource) and `Xyz` (business wrapper)
+- Contains: 116 resource service files matching server entity names (e.g., `procurements.js`, `companies.js`, `agreements.js`, `applications.js`)
 - REST URL pattern: `webresources/sc/<entity>/:id` with POST `query` action at `webresources/sc/<entity>/query`
 
 **`publicERANET-client/app/views/`:**
-- Purpose: HTML partial templates; directory structure mirrors `scripts/controllers/`
-- Contains: `.html` files per screen/feature; `views/general/tabs.html` is a shared shell used by tab-based controllers
+- Purpose: HTML partial templates; directory structure mostly mirrors `scripts/controllers/`
+- Contains: `.html` files per screen/feature; `views/general/tabs.html` is a shared shell used by tab-based controllers; `views/directives/` holds directive templates
 
 **`publicERANET-client/app/scripts.no.min/langs/`:**
-- Purpose: Translation files for `angular-translate`; loaded as static `.js` files
-- Key: Slovak language is the primary/fallback (`$translateProvider.fallbackLanguage('sk')`)
+- Purpose: Translation files for `angular-translate`; loaded as static `.js` files (`sk.js`, `en.js`, `hr.js`)
+- Key: Slovak language is the primary/fallback (`$translateProvider.fallbackLanguage('sk')`); the language selector offers only `sk` and `en`
 
 **`publicERANET-server/src/main/java/.../service/`:**
 - Purpose: All JAX-RS REST endpoints + EJB business logic (merged)
-- Contains: 166 `*Service.java` files; `ApplicationConfig.java` registers all of them explicitly
-- Subdirectories: `pdf/` (11 PDF services), `supplier/` (2 supplier-specific services), `excel/`, `logic/`, `comparator/`, `enums/`, `help/`
+- Contains: ~146 `*Service.java` files; `ApplicationConfig.java` registers them explicitly
+- Subdirectories: `pdf/` (11 PDF services), `supplier/`, `excel/`, `logic/`, `comparator/`, `enums/`, `help/`, `ecm/`, `jms/`
 
 **`publicERANET-server/src/main/java/.../dao/`:**
 - Purpose: JPA data access via EclipseLink; `BaseDao<T>` provides generic CRUD + criteria queries
-- Contains: 128 DAO files; `helpDto/` holds query helper objects (`FindParameters`, `FindResult`, `QueryFilter`, `OrderByField`)
+- Contains: ~115 DAO files; `helpDto/` holds query helper objects (`FindParameters`, `FindResult`, `QueryFilter`, `OrderByField`)
 
 **`publicERANET-server/src/main/java/.../dto/`:**
 - Purpose: JPA `@Entity` classes for all domain objects; double as JSON response bodies
-- Contains: 208 entity classes; `face/` contains interfaces (`HasId`, `HasCopy`, `IsProcurement`) used for generic copy/clone operations in BaseService
+- Contains: ~185 entity classes; `face/` contains interfaces (`HasId`, `HasCopy`, `IsProcurement`) used for generic copy/clone operations in BaseService
+
+**`publicERANET-server/src/main/java/.../api/`:**
+- Purpose: Versioned REST API under `api/v1/...` (`InternalRequestCategoryApiController`, `PortfolioApiController`) with its own DTOs and mappers
+
+**`publicERANET-server/src/main/java/.../filter/`:**
+- Purpose: JAX-RS request filters; `BearerFilter` validates the JWT bearer token and checks the role annotations, `JWTAuthFilter` serves `@JWTSecured` endpoints, `CustomDynamicFeature` registers them
 
 **`publicERANET-server/src/main/sql/`:**
-- Purpose: Versioned SQL migration scripts organized by version number (1.2 through 2.11.0)
-- Contains: Directories per version; applied manually (no Flyway/Liquibase detected)
+- Purpose: Liquibase changelogs; `db.changelog-master.xml` includes the per-version changelogs
+- Contains: Directories per version (1.2 through 2.4.0), plus top-level changelogs and standalone INSERT scripts; applied with `configS.bat`
 
 **`publicERANET-server/lib/`:**
 - Purpose: Local Maven repository for Aspose commercial JARs not available in Maven Central
@@ -153,28 +169,29 @@ seas_test/                        # Workspace root
 **Configuration:**
 - `publicERANET-server/src/main/resources/META-INF/persistence.xml`: JPA persistence unit, data source, entity list
 - `publicERANET-server/src/main/setup/glassfish-resources.xml`: JDBC pool, MySQL connection properties
-- `publicERANET-server/src/main/webapp/WEB-INF/web.xml`: Servlet descriptor, security roles, session config
+- `publicERANET-server/src/main/webapp/WEB-INF/web.xml`: Servlet descriptor, security constraint, session config
 - `publicERANET-server/src/main/webapp/WEB-INF/glassfish-web.xml`: GlassFish deployment — context root `/public`, client static file path
-- `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml`: WildFly deployment — context root `/public_seas`
+- `publicERANET-server/src/main/webapp/WEB-INF/jboss-web.xml`: WildFly deployment — context root `/public_zsd`
 - `publicERANET-client/app/scripts/config.js`: Angular `config` module with build timestamp constant
-- `publicERANET-client/Gruntfile.js`: Build pipeline (concat, uglify, copy, ngconstant for config.js)
+- `publicERANET-client/Gruntfile.js`: Build pipeline (usemin, concat, uglify, cssmin, copy, ngconstant for config.js)
 - `publicERANET-client/bower.json`: Front-end dependency manifest
 
 **Core Logic:**
 - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/BaseService.java`: Abstract base for all services
 - `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dao/BaseDao.java`: Abstract base for all DAOs
-- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/AuthenticationService.java`: Login, logout, SAML, OIDC, password reset
-- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/OIDCService.java`: OpenID Connect / JWT
-- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/ws/RealTimeEndpoint.java`: WebSocket push
+- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/AuthenticationService.java`: Login, logout, SAML, password reset
+- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/filter/BearerFilter.java`: JWT bearer-token validation and role checks
+- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/ws/PingEndpoint.java`: WebSocket endpoint used by the client (`/websockets/ping/{groupId}/{userId}/{guid}`)
+- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/ws/RealTimeEndpoint.java`: WebSocket push (`/websockets/realtime`)
 
 **SAML / SSO:**
 - `publicERANET-server/src/main/resources/META-INF/idp.metadata.xml`: SAML IdP metadata (active)
 - `publicERANET-server/src/main/resources/META-INF/sp.metadata.xml`: SAML SP metadata
-- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/UpvsSsoService.java`: UPVS government SSO
+- `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/sso/SsoService.java`: SSO service
 
 **Testing:**
-- `publicERANET-client/test/spec/`: Karma/Jasmine test specs (minimal)
-- `publicERANET-server/src/test/java/`: Java test directory (minimal)
+- `publicERANET-client/test/spec/`: Karma/Jasmine test specs (single stub)
+- `publicERANET-server/src/test/java/test/TestWs.java`: the only Java test class
 
 ## Naming Conventions
 
@@ -182,28 +199,29 @@ seas_test/                        # Workspace root
 - Controllers: camelCase name matching entity/feature, suffix not required (e.g., `buyerCompanyProfile.js`, `main.js`)
 - Resource services: pluralised entity name, lowercase (e.g., `companies.js`, `agreements.js`, `procurements.js`)
 - Directive files: camelCase description of widget (e.g., `filesTable.js`, `procurementsTable.js`)
-- Views: camelCase HTML files matching feature (e.g., `procurementsList.html`, `editInternalRequestBase.html`)
+- Views: camelCase HTML files matching feature (e.g., `procurementsList.html`, `planning/editInternalRequest/editInternalRequestBase.html`)
 
 **Client — Angular symbols:**
-- Module names: `eranetPublic` (app), `controllers`, `services`, `directives`, `filters`, `app.main`, `app.navigation`, `config`
+- Module names: `eranetPublic` (app), `controllers`, `services`, `directives`, `filters`, `app.main`, `app.navigation`, `app.localize`, `app.activity`, `app.smartui`, `config`
 - Controller names: PascalCase + `Controller` suffix (e.g., `MainController`, `ProcurementDefinitionController`)
 - Service names: PascalCase (e.g., `Companies`, `CompaniesResource`, `WebStorage`, `Utils`)
 - Directive names: camelCase in JS (e.g., `filesTable`), kebab-case in HTML (`files-table`)
 
 **Server — Java packages:**
 - Root: `sk.innovis.eranetpublic.server`
-- Sub-packages match layer: `.service`, `.dao`, `.dto`, `.ws`, `.sso`, `.saml`, `.interceptor`, `.serialization`, `.configuration`, `.annotation`
+- Sub-packages match layer: `.service`, `.dao`, `.dto`, `.api`, `.filter`, `.ws`, `.sso`, `.saml`, `.serialization`, `.configuration`, `.annotation`, `.exception`
 
 **Server — Java classes:**
 - Entities: PascalCase noun (e.g., `Procurement`, `CompanyInProcurement`, `AuctionResult`)
 - Services: PascalCase + `Service` suffix (e.g., `ProcurementService`, `AuthenticationService`)
 - DAOs: PascalCase + `Dao` suffix (e.g., `ProcurementDao`, `CompanyDao`)
-- Configuration: PascalCase + `Configuration` suffix (e.g., `OIDCConfiguration`, `MailServerConfiguration`)
+- Configuration: PascalCase + `Configuration` suffix (e.g., `GeneralConfiguration`, `MailServerConfiguration`)
 
 **Server — REST URL convention:**
 - Pattern: `webresources/sc/<entityPlural>/` for secured CRUD
 - Query: POST to `webresources/sc/<entityPlural>/query`
-- Auth: `webresources/auth/` (unsecured login/logout)
+- Auth: `webresources/auth/` (login/logout/token validation)
+- Versioned API: `api/v1/<resource>` (`api/` package)
 
 ## Where to Add New Code
 
@@ -211,15 +229,18 @@ seas_test/                        # Workspace root
 - Controller: `publicERANET-client/app/scripts/controllers/<area>/<FeatureName>.js`
 - View template: `publicERANET-client/app/views/<area>/<featureName>.html`
 - Route: Add `$routeProvider.when(...)` entry in `publicERANET-client/app/scripts/ng.app.js`
+- Register the new controller file with a `<script>` tag in `publicERANET-client/app/index.html` (every app script is listed there; unlisted files are not loaded or built)
 
 **New API resource service (client):**
 - Implementation: `publicERANET-client/app/scripts/service/resources/<entityPlural>.js`
 - Pattern: Export both `XyzResource` ($resource) and `Xyz` (business wrapper) from same file
 - REST URL: `webresources/sc/<entityPlural>/:id` with `query` action at `.../query`
+- Register with a `<script>` tag in `publicERANET-client/app/index.html`
 
 **New directive (client):**
 - Implementation: `publicERANET-client/app/scripts/directives/<directiveName>.js`
 - View template (if needed): `publicERANET-client/app/views/directives/<directiveName>.html`
+- Register with a `<script>` tag in `publicERANET-client/app/index.html`
 
 **New REST endpoint + entity (server):**
 1. Entity: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/dto/<EntityName>.java` — add `@Entity @Table @XmlRootElement @JsonIgnoreProperties(ignoreUnknown=true)`
@@ -229,7 +250,7 @@ seas_test/                        # Workspace root
 5. Register service in: `publicERANET-server/src/main/java/sk/innovis/eranetpublic/server/service/ApplicationConfig.java` — add `resources.add(...)` in `addRestResources()`
 
 **Database migration:**
-- Add SQL script in: `publicERANET-server/src/main/sql/<new-version>/` (follow existing version numbering)
+- Add a Liquibase changeset (author `m.bijalko`) in the matching version dir under `publicERANET-server/src/main/sql/` and include it from `db.changelog-master.xml`; raw `.sql` scripts only for INSERTs
 
 **New translation key:**
 - Add to: `publicERANET-client/app/scripts.no.min/langs/<lang>.js`
@@ -239,7 +260,7 @@ seas_test/                        # Workspace root
 **`publicERANET-client/app/bower_components/`:**
 - Purpose: Bower-installed front-end dependencies (Angular, Bootstrap, ui-select, ng-table, etc.)
 - Generated: Yes (by `bower install`)
-- Committed: Yes (present in repo — no `.gitignore` exclusion detected)
+- Committed: No (excluded by `.gitignore`)
 
 **`publicERANET-client/app/scripts/plugin/`:**
 - Purpose: Vendored jQuery plugins bundled with SmartAdmin template
@@ -252,15 +273,10 @@ seas_test/                        # Workspace root
 - Committed: Yes
 
 **`publicERANET-server/src/main/sql/`:**
-- Purpose: Versioned SQL migration scripts; applied manually to MySQL
+- Purpose: Liquibase changelogs and standalone INSERT scripts
 - Generated: No
 - Committed: Yes
 
-**`publicERANET-server/eranet-domain/` and `public-eranet/`:**
-- Purpose: Git submodules for shared libraries
-- Java source: Not present in current checkout — both directories contain only resources or are empty
-- Committed: Submodule references committed; Java source must be fetched via `git submodule update --init`
-
 ---
 
-*Structure analysis: 2026-06-03*
+*Structure analysis: 2026-10-16*

@@ -1,10 +1,10 @@
 # Testing Patterns
 
-**Analysis Date:** 2026-06-03
+**Analysis Date:** 2026-10-16
 
 ## Summary
 
-This project has **minimal test coverage**. The client has Karma/Jasmine infrastructure configured but only a single stub spec file exists. The server has a `src/test/java` directory that is completely empty. No test files of any kind exist in the server module. Testing is configured but largely absent in practice.
+This project has **minimal test coverage**. The client has Karma/Jasmine infrastructure configured but only a single stub spec file exists. The server declares JUnit 4.6 and has exactly one test class (`src/test/java/test/TestWs.java`, a JAXB serialization smoke test). Testing is configured but largely absent in practice.
 
 ---
 
@@ -29,8 +29,10 @@ grunt karma        # Runs karma unit config directly (singleRun: true in Gruntfi
 ```
 
 > **Caveat:** the Karma 0.12 suite does **not** start on modern Node (e.g. Node 24) — its bundled
-> socket.io crashes (`Cannot read properties of undefined (reading 'prototype')`). Don't burn time
-> forcing it; rely on manual browser smoke testing until the stack is upgraded.
+> socket.io crashes (`Cannot read properties of undefined (reading 'prototype')`). A second blocker:
+> `karma-jasmine` and `karma-chrome-launcher` are not declared in `package.json`, so
+> `frameworks: ['jasmine']` has no plugin behind it. Don't burn time forcing it; rely on manual
+> browser smoke testing until the stack is upgraded.
 
 ### Test File Locations
 
@@ -88,8 +90,8 @@ Note: `yoemanTestApp` does not exist in the actual application (the real module 
 ### How Karma is Configured
 
 **Unit (karma.conf.js):**
-- Loads: Angular core, angular-mocks, angular-resource, angular-cookies, angular-sanitize, angular-route (from `app/bower_components/`)
-- Loads all app scripts: `app/scripts/*.js` and `app/scripts/**/*.js`
+- Loads: Angular core, angular-mocks, angular-resource, angular-cookies, angular-sanitize, angular-route (from `app/bower_components/`); `angular-cookies` is neither in `bower.json` nor installed, and the list omits jQuery, ui-bootstrap, ngTable, angular-translate and the other app dependencies
+- Loads all app scripts: `app/scripts/*.js` and `app/scripts/**/*.js` (this also pulls in the SmartAdmin `plugin/` scripts)
 - Loads: `test/mock/**/*.js` and `test/spec/**/*.js`
 - Browser: Chrome (not PhantomJS)
 - `autoWatch: false`, `singleRun: false` (but overridden to `singleRun: true` in Gruntfile task config)
@@ -150,23 +152,20 @@ before_script:
 
 **Build tool:** Maven 3 with `maven-compiler-plugin` 3.1 (Java source/target 1.8)
 
-**Test directory:** `publicERANET-server/src/test/java/` — **directory exists but contains no files**
+**Test dependency:** `junit:junit:4.6` (`test` scope) in `publicERANET-server/pom.xml`; no `maven-surefire-plugin` configuration (the default surefire runs).
 
-No test dependencies are declared in `publicERANET-server/pom.xml`:
-- No JUnit dependency
-- No Mockito dependency
-- No Arquillian dependency
-- No `surefire-plugin` configuration
+**Test directory:** `publicERANET-server/src/test/java/test/TestWs.java` — the **only** test class (139 lines, JUnit 4):
+- One active `@Test`, `testSerializationVk`, a JAXB serialization smoke test for `ixtent.ws.dto.EranetVK`
+- A second `@Test` is commented out; `sendToXEcmIfNeccesary` is a helper (CXF + `META-INF/xecm.wsdl` + `xecm.jks`), not a test
+- `target/surefire-reports/test.TestWs.txt` shows it has been run (1 test, 0 failures)
 
-**Conclusion: Zero server-side tests exist. No test framework is configured.**
+Not present: Mockito, Arquillian, JaCoCo.
 
-### eranet-domain module
+**Conclusion: effectively no server-side test coverage — one serialization smoke test and no business-logic tests.**
 
-`publicERANET-server/eranet-domain/` — secondary module containing only a `src/main/resources/META-INF/` directory. No test directory, no Java sources, no test configuration.
+### Modules
 
-### public-eranet module
-
-`publicERANET-server/public-eranet/` — contains service classes under `src/main/java/sk/innovis/eranetpublic/server/service/` but no `src/test/` tree. No tests.
+`publicERANET-server/` is a single-module WAR; there are no `eranet-domain/` or `public-eranet/` submodules in this checkout.
 
 ---
 
@@ -176,7 +175,7 @@ No test dependencies are declared in `publicERANET-server/pom.xml`:
 
 1. Update `test/spec/controllers/main.js` to reference `eranetPublic` (not `yoemanTestApp`)
 2. Install Karma CLI and Chrome (or switch to `PhantomJS` or `ChromeHeadless` for CI)
-3. Add `angular-mocks` to bower.json (verify it resolves from `bower_components/angular-mocks/`)
+3. Add `karma-jasmine` and `karma-chrome-launcher` to `package.json`, and complete the `files` list in `karma.conf.js` (`angular-mocks` is already a Bower devDependency)
 4. Create `test/mock/` files for services the controllers depend on
 5. Pattern to use when writing new specs:
 
@@ -205,7 +204,7 @@ describe('Controller: CompanyProfileController', function () {
 
 ### Server (Java)
 
-1. Add JUnit 4 or JUnit 5 to `pom.xml` `<scope>test</scope>` dependencies
+1. Upgrade JUnit (the pom has 4.6) and keep the `<scope>test</scope>` dependency
 2. Add Mockito for mocking EJB/CDI injection points
 3. Add Arquillian if integration/container tests are needed (given `@Stateless` EJBs)
 4. Add `maven-surefire-plugin` configuration if custom test patterns required
@@ -222,4 +221,4 @@ No coverage requirements are enforced anywhere in the build.
 
 ---
 
-*Testing analysis: 2026-06-03*
+*Testing analysis: 2026-10-16*
