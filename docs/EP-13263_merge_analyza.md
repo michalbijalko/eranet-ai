@@ -204,3 +204,31 @@ Port `2.6.0/db.changelog-EP7361.xml` by Liquibase vyhodnotil ako nový changeset
 - **Schvaľovateľ, ktorý je zároveň pozorovateľ** — musí vedieť potvrdiť požiadavku.
 - **Modul e-zmluvy** — riziko 4.3 (zmiešané názvoslovie ZFK/FK, log aktivít).
 - **Ostatné obrazovky pozorovateľov** (interné požiadavky, ročný plán, prevádzkové požiadavky, bežný rozpočet, e-zmluvy, e-dokumenty) — regresne, kvôli zdieľanému `userRole` resolve.
+
+---
+
+## 8. 2. dávka — prepínačmi riadené tickety (EP-11296, EP-11309)
+
+Rozhodovacia analýza „je tam prepínač?“ pre epiku EP-11645 je v [`EP-13263_merge_rozhodnutia.xlsx`](EP-13263_merge_rozhodnutia.xlsx) (stĺpec „Mergovat do ttsk?“). Pravidlo: **portovať len ticket, ktorého správanie je za prepínačom, ktorý sa dá nechať vypnutý** a zachovať tak súčasné správanie TTSK. Bez prepínača → neportovať.
+
+**Portované (majú prepínač, nasadené OFF):**
+- **EP-11309** — `Setting ExternalRequestInstructionsForApproval`: editovateľné upozornenie (červený text) v detaile schvaľovania externej požiadavky, zobrazí sa len pri neprázdnej hodnote. **Seed prázdny** → defaultne skryté.
+- **EP-11296** — `Setting ExternalRequestConfirmationNotificationToObservers`: notifikácia pozorovateľom pri potvrdení požiadavky. **Seed `false`** → defaultne len autor. Filter pozorovateľov je **verný port** (porovnáva id riadku pozorovateľa s id autora — id-space quirk, možná dvojitá notifikácia autora-pozorovateľa; ponechané s jednoriadkovým markerom, opraví sa tu aj na `poseidon-test`). Text emailu **ostáva TTSK** — Prešovský text z EP-11593 sa neportuje.
+
+**Neportované (bez prepínača):** EP-11286, EP-11289, EP-11294, EP-11320 (+ `@NotNull`/FK), EP-11593, EP-11723. **Podmienené/odložené:** EP-11288 (konfiguračný JSON engine, fail-closed), EP-11305, EP-11620.
+
+**Postup portu:** vždy `cherry-pick -x` pôvodného commitu + konflikty; `feat(EP-13263, EP-13264)` len na nutnú TTSK zmenu navyše (prepnutie seedov na OFF). Plán: [`plans/EP-13263-batch2-externe-poziadavky.md`](plans/EP-13263-batch2-externe-poziadavky.md).
+
+**Commity (vetva `feature/ttsk-merge-cps`, lokálne, nepushnuté):**
+
+| Repo | Commit | Ticket |
+|---|---|---|
+| server | `f0cc3bc1b` ← `4144b7c3c` | EP-11309 (pôvodný) |
+| server | `a60eef890` ← `1a4be5650` | EP-11296 (pôvodný) |
+| server | `c8762b7a3` ← `1fc549834` | EP-11296 (pôvodný, konflikt: bez EP-11593 textu a duplicitného EJB) |
+| server | `966052963` | EP-13263 — seed EP-11309 prázdny (OFF) |
+| server | `188646fa9` | EP-13263 — seed EP-11296 `false` (OFF) |
+| client | `80e7bb4a9` ← `a91236fe5` | EP-11309 (pôvodný; doplnený chýbajúci `</div>`) |
+| client | `d37efc959` ← `2b1389610` | EP-11296 (pôvodný) |
+
+Server builduje (JDK 8, `mvn clean package` → WAR). **Na overenie v appke:** OFF stav (žiadna zmena oproti dnešku — bez červeného upozornenia, notifikácia len autorovi); po zapnutí prepínačov sa upozornenie zobrazí / pozorovatelia dostanú notifikáciu.
